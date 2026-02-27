@@ -8,7 +8,8 @@ import {
   Bell,
 } from "lucide-react";
 import { FEATURES } from "../../constants";
-import { Container, SectionHeading } from "../ui";
+import { Container, SectionHeading, Card, IconBox } from "../ui";
+import { IMAGES } from "../../config/images";
 
 const iconMap = { Shield, Calendar, FileSearch, BadgeCheck, Languages, Bell };
 
@@ -26,21 +27,19 @@ export default function Features() {
           {FEATURES.map((feature, idx) => {
             const Icon = iconMap[feature.icon];
             return (
-              <motion.div
+              <Card
                 key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ delay: idx * 0.08 }}
-                className="group relative surface-card rounded-2xl p-7 hover:surface-card-hover transition-all duration-300"
+                variant="default"
+                padding="lg"
+                animated
+                animationDelay={idx * 0.08}
+                className="relative overflow-hidden"
               >
                 {/* Corner accent on hover */}
                 <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-bl from-gold-500/6 to-transparent rounded-bl-3xl rounded-tr-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true" />
 
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-gold-500/10 flex items-center justify-center mb-5 group-hover:bg-gold-500/15 group-hover:scale-110 transition-all duration-300">
-                    <Icon className="w-6 h-6 text-gold-400" />
-                  </div>
+                  <IconBox icon={Icon} color="gold" size="md" className="mb-5" />
 
                   <h3 className="text-lg font-semibold text-neutral-100 mb-2">
                     {feature.title}
@@ -49,9 +48,33 @@ export default function Features() {
                     {feature.description}
                   </p>
                 </div>
-              </motion.div>
+              </Card>
             );
           })}
+        </div>
+
+        {/* Feature accent image — legal consultation */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <div className="relative rounded-2xl overflow-hidden border border-white/6 h-48 sm:h-64">
+            <img
+              src={IMAGES.sections.consultation.src}
+              alt={IMAGES.sections.consultation.alt}
+              className="w-full h-full object-cover opacity-30"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-linear-to-r from-dark-900 via-dark-900/80 to-transparent" />
+            <div className="absolute inset-0 flex items-center p-8 sm:p-12">
+              <div>
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-50 mb-2">
+                  Built for <span className="gradient-gold-text">Sri Lanka&apos;s</span> Legal Ecosystem
+                </h3>
+                <p className="text-neutral-400 text-sm sm:text-base max-w-lg">
+                  Every feature designed with the unique needs of Sri Lankan legal professionals and their clients in mind.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </Container>
     </section>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Scale } from "lucide-react";
 import { Button, Container } from "../ui";
+import { IMAGES } from "../../config/images";
 
 export default function CallToAction() {
   return (
@@ -15,10 +16,11 @@ export default function CallToAction() {
           {/* Background image */}
           <div className="absolute inset-0" aria-hidden="true">
             <img
-              src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=1200&h=600&fit=crop&auto=format&q=60"
+              src={IMAGES.sections.callToAction.src}
               alt=""
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-dark-950/90" />
             <div className="absolute inset-0 bg-linear-to-br from-dark-950/50 to-transparent" />

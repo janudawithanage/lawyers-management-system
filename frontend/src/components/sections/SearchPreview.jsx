@@ -15,7 +15,8 @@ import {
   LANGUAGE_OPTIONS,
   MOCK_LAWYERS,
 } from "../../constants";
-import { Button, Container, SectionHeading } from "../ui";
+import { Button, Container, SectionHeading, Card, Badge } from "../ui";
+import { getInitials } from "../../utils/formatters";
 
 function SelectField({ icon: Icon, placeholder, options, value, onChange }) {
   return (
@@ -53,7 +54,7 @@ function LawyerCard({ lawyer }) {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl gradient-gold-btn flex items-center justify-center text-dark-950 font-bold text-sm shrink-0">
-              {lawyer.name.split(" ").map((n) => n[0]).join("")}
+              {getInitials(lawyer.name)}
             </div>
             <div>
               <h4 className="font-semibold text-neutral-100 group-hover:text-gold-400 transition-colors">
@@ -63,10 +64,10 @@ function LawyerCard({ lawyer }) {
             </div>
           </div>
           {lawyer.verified && (
-            <span className="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            <Badge variant="emerald" size="sm">
               <ShieldCheck className="w-3.5 h-3.5" />
               Verified
-            </span>
+            </Badge>
           )}
         </div>
 

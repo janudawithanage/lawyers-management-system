@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { cn } from "../../utils/cn";
 
 const variants = {
   primary:
@@ -35,7 +36,12 @@ const Button = forwardRef(
     const baseClasses =
       "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:ring-offset-2 focus:ring-offset-dark-950 disabled:opacity-50 disabled:cursor-not-allowed";
 
-    const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
+    const classes = cn(
+      baseClasses,
+      variants[variant],
+      sizes[size],
+      className
+    );
 
     if (href) {
       return (

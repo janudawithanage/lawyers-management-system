@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { MapPin, Lock, Scale, Eye } from "lucide-react";
 import { WHY_CHOOSE } from "../../constants";
-import { Container, SectionHeading } from "../ui";
+import { Container, SectionHeading, Card, IconBox } from "../ui";
+import { IMAGES } from "../../config/images";
 
 const iconMap = { MapPin, Lock, Scale, Eye };
 
@@ -15,10 +16,11 @@ export default function WhyChoose() {
       {/* Background image with heavy overlay */}
       <div className="absolute inset-0" aria-hidden="true">
         <img
-          src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1400&h=800&fit=crop&auto=format&q=60"
+          src={IMAGES.sections.whyChoose.src}
           alt=""
           className="w-full h-full object-cover opacity-4"
           loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-linear-to-b from-dark-950 via-dark-950/95 to-dark-950" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gold-500/3 rounded-full blur-[120px]" />
@@ -36,17 +38,14 @@ export default function WhyChoose() {
           {WHY_CHOOSE.map((item, idx) => {
             const Icon = iconMap[item.icon];
             return (
-              <motion.div
+              <Card
                 key={item.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ delay: idx * 0.1 }}
-                className="glass-gold rounded-2xl p-7 hover:bg-gold-500/8 transition-all duration-300 group"
+                variant="gold"
+                padding="lg"
+                animated
+                animationDelay={idx * 0.1}
               >
-                <div className="w-12 h-12 rounded-xl bg-gold-500/15 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                  <Icon className="w-6 h-6 text-gold-400" />
-                </div>
+                <IconBox icon={Icon} color="gold" size="md" className="mb-5" />
 
                 <h3 className="text-xl font-semibold text-neutral-50 mb-2">
                   {item.title}
@@ -54,7 +53,7 @@ export default function WhyChoose() {
                 <p className="text-sm text-neutral-400 leading-relaxed">
                   {item.description}
                 </p>
-              </motion.div>
+              </Card>
             );
           })}
         </div>

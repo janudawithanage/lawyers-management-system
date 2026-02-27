@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { TESTIMONIALS } from "../../constants";
-import { Container, SectionHeading } from "../ui";
+import { Container, SectionHeading, Card } from "../ui";
+import { getInitials } from "../../utils/formatters";
 
 export default function Testimonials() {
   return (
@@ -15,13 +16,13 @@ export default function Testimonials() {
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {TESTIMONIALS.map((testimonial, idx) => (
-            <motion.div
+            <Card
               key={testimonial.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: idx * 0.1 }}
-              className="relative surface-card rounded-2xl p-7 hover:surface-card-hover transition-all duration-300"
+              variant="default"
+              padding="lg"
+              animated
+              animationDelay={idx * 0.1}
+              className="relative"
             >
               {/* Quote icon */}
               <div className="absolute top-6 right-6" aria-hidden="true">
@@ -43,7 +44,7 @@ export default function Testimonials() {
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-white/6">
                 <div className="w-10 h-10 rounded-full gradient-gold-btn flex items-center justify-center text-dark-950 font-semibold text-xs shrink-0">
-                  {testimonial.name.split(" ").map((n) => n[0]).join("")}
+                  {getInitials(testimonial.name)}
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-neutral-100">
@@ -54,7 +55,7 @@ export default function Testimonials() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </Card>
           ))}
         </div>
       </Container>

@@ -1,4 +1,10 @@
-import { Navbar, Footer } from "../components/layout";
+/**
+ * LandingPage — Public-facing home page.
+ *
+ * Rendered inside PublicLayout (which provides Navbar + Footer).
+ * All sections are imported from the sections module.
+ */
+
 import {
   Hero,
   SearchPreview,
@@ -12,19 +18,15 @@ import {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-dark-950 text-neutral-100 overflow-x-hidden">
-      <Navbar />
-      <main>
-        <Hero />
-        <SearchPreview />
-        <HowItWorks />
-        <Features />
-        <WhyChoose />
-        <FutureVision />
-        <Testimonials />
-        <CallToAction />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <Hero />
+      <SearchPreview />
+      <HowItWorks />
+      <Features />
+      <WhyChoose />
+      <FutureVision />
+      <Testimonials />
+      <CallToAction />
+    </>
   );
 }

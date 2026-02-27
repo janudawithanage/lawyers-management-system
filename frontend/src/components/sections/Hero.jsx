@@ -7,7 +7,9 @@ import {
   Search,
 } from "lucide-react";
 import { TRUST_INDICATORS } from "../../constants";
-import { Button, Container } from "../ui";
+import { Button, Container, Badge } from "../ui";
+import { OptimizedImage } from "../common";
+import { IMAGES } from "../../config/images";
 
 export default function Hero() {
   return (
@@ -48,12 +50,11 @@ export default function Hero() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/4 border border-white/6 backdrop-blur-sm mb-6"
+              className="mb-6"
             >
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-sm text-neutral-400 font-medium">
+              <Badge variant="live" size="lg" dot>
                 Trusted by 500+ verified lawyers across Sri Lanka
-              </span>
+              </Badge>
             </motion.div>
 
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold text-neutral-50 leading-[1.1] mb-6 text-balance">
@@ -113,14 +114,19 @@ export default function Hero() {
             <div className="relative">
               {/* Hero image card — courtroom/legal themed */}
               <div className="relative rounded-3xl overflow-hidden border border-white/6 shadow-2xl shadow-black/50">
-                <img
-                  src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=400&fit=crop&auto=format&q=80"
-                  alt="Legal scales of justice on desk with legal books"
-                  className="w-full h-[380px] object-cover"
+                <OptimizedImage
+                  src={IMAGES.hero.primary.src}
+                  srcSet={IMAGES.hero.primary.srcSet}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  alt={IMAGES.hero.primary.alt}
+                  width={IMAGES.hero.primary.width}
+                  height={IMAGES.hero.primary.height}
+                  className="w-full h-[380px]"
                   loading="eager"
+                  overlay
+                  overlayClassName="bg-linear-to-t from-dark-950 via-dark-950/40 to-transparent"
+                  containerClassName="w-full h-[380px]"
                 />
-                {/* Dark overlay gradient */}
-                <div className="absolute inset-0 bg-linear-to-t from-dark-950 via-dark-950/40 to-transparent" />
 
                 {/* Overlay content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6">

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import Badge from "./Badge";
 
 export default function SectionHeading({
   badge,
@@ -17,9 +18,9 @@ export default function SectionHeading({
       className={`max-w-3xl mb-16 ${alignClass}`}
     >
       {badge && (
-        <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-4 bg-gold-500/10 text-gold-400 border border-gold-500/20">
+        <Badge variant="gold" size="lg" className="mb-4">
           {badge}
-        </span>
+        </Badge>
       )}
       <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4 text-neutral-50">
         {title}

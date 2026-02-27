@@ -1,19 +1,58 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SL-LMS — Connect with verified lawyers across Sri Lanka. Search by specialization, district, and language. Book appointments, upload documents, and track cases securely." />
-    <meta name="keywords" content="Sri Lanka lawyers, legal services, lawyer management, BASL, legal tech, attorney, advocate" />
+
+    <!-- Primary SEO -->
+    <title>SL-LMS — Sri Lanka Lawyer Management System</title>
+    <meta name="description" content="SL-LMS — Connect with BASL-verified lawyers across Sri Lanka. Search by specialization, district, and language. Book appointments, upload documents, and track cases securely." />
+    <meta name="keywords" content="Sri Lanka lawyers, legal services, lawyer management, BASL, legal tech, attorney, advocate, Sri Lanka legal platform, lawyer booking, case tracking" />
     <meta name="author" content="SL-LMS" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#000000" />
+
+    <!-- Open Graph / Social -->
     <meta property="og:title" content="SL-LMS — Sri Lanka Lawyer Management System" />
-    <meta property="og:description" content="Connecting you with verified lawyers across Sri Lanka." />
+    <meta property="og:description" content="Connect with BASL-verified lawyers across Sri Lanka. Search, book, and manage your legal needs." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sl-lms.lk" />
+    <meta property="og:site_name" content="SL-LMS" />
+    <meta property="og:locale" content="en_LK" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SL-LMS — Sri Lanka Lawyer Management System" />
+    <meta name="twitter:description" content="Connect with BASL-verified lawyers across Sri Lanka." />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SL-LMS",
+        "alternateName": "Sri Lanka Lawyer Management System",
+        "url": "https://sl-lms.lk",
+        "description": "Connect with BASL-verified lawyers across Sri Lanka",
+        "applicationCategory": "LegalService",
+        "operatingSystem": "Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "LKR"
+        },
+        "areaServed": {
+          "@type": "Country",
+          "name": "Sri Lanka"
+        }
+      }
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>SL-LMS — Sri Lanka Lawyer Management System</title>
   </head>
   <body>
     <div id="root"></div>
