@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens (Tailwind v4 @theme) ─── */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+
+  /* Primary — Deep Navy */
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #dde4ff;
+  --color-primary-200: #c3ceff;
+  --color-primary-300: #9aabff;
+  --color-primary-400: #6f7fff;
+  --color-primary-500: #4f56f6;
+  --color-primary-600: #3a32eb;
+  --color-primary-700: #0f1d5b;
+  --color-primary-800: #0b1644;
+  --color-primary-900: #070e2e;
+  --color-primary-950: #040818;
+
+  /* Gold Accent */
+  --color-gold-50: #fffcf0;
+  --color-gold-100: #fff6d4;
+  --color-gold-200: #ffeaa3;
+  --color-gold-300: #ffd966;
+  --color-gold-400: #f5c542;
+  --color-gold-500: #d4a017;
+  --color-gold-600: #b8860b;
+  --color-gold-700: #946b08;
+  --color-gold-800: #6b4e06;
+  --color-gold-900: #433104;
+
+  /* Slate / Neutral */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+}
+
+/* ─── Base Layer ─── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-slate-800);
+    background-color: #ffffff;
+    line-height: 1.7;
+  }
+
+  ::selection {
+    background-color: var(--color-gold-200);
+    color: var(--color-primary-900);
+  }
+}
+
+/* ─── Custom Utilities ─── */
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-900) 100%);
+}
+
+@utility gradient-hero {
+  background: linear-gradient(
+    160deg,
+    var(--color-primary-950) 0%,
+    var(--color-primary-800) 40%,
+    var(--color-primary-700) 100%
+  );
+}
+
+@utility gradient-gold {
+  background: linear-gradient(135deg, var(--color-gold-400) 0%, var(--color-gold-600) 100%);
+}
+
+@utility gradient-card {
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-slate-50) 100%);
+}
+
+@utility glass-morphism {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ─── Keyframes ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(212, 160, 23, 0); }
+}
