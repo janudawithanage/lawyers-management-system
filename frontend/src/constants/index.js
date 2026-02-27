@@ -73,7 +73,7 @@ export const MOCK_LAWYERS = [
   {
     id: 1,
     name: "Ayesha Perera",
-    title: "Attorney-at-Law",
+    title: "Senior Attorney-at-Law",
     specialization: "Family Law",
     district: "Colombo",
     languages: ["Sinhala", "English"],
@@ -81,12 +81,12 @@ export const MOCK_LAWYERS = [
     reviews: 128,
     experience: "12 years",
     verified: true,
-    avatar: null,
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=600&auto=format&fit=crop&crop=face&q=80",
   },
   {
     id: 2,
     name: "Kumaran Selvam",
-    title: "Attorney-at-Law",
+    title: "Senior Attorney-at-Law",
     specialization: "Criminal Law",
     district: "Jaffna",
     languages: ["Tamil", "English"],
@@ -94,12 +94,12 @@ export const MOCK_LAWYERS = [
     reviews: 96,
     experience: "15 years",
     verified: true,
-    avatar: null,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&auto=format&fit=crop&crop=face&q=80",
   },
   {
     id: 3,
     name: "Dinesh Fernando",
-    title: "Attorney-at-Law",
+    title: "Senior Attorney-at-Law",
     specialization: "Corporate Law",
     district: "Gampaha",
     languages: ["Sinhala", "English"],
@@ -107,7 +107,7 @@ export const MOCK_LAWYERS = [
     reviews: 84,
     experience: "10 years",
     verified: true,
-    avatar: null,
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=600&auto=format&fit=crop&crop=face&q=80",
   },
 ];
 

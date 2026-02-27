@@ -121,43 +121,12 @@ export default function Hero() {
                   alt={IMAGES.hero.primary.alt}
                   width={IMAGES.hero.primary.width}
                   height={IMAGES.hero.primary.height}
-                  className="w-full h-[380px]"
+                  className="w-full h-[420px]"
                   loading="eager"
                   overlay
-                  overlayClassName="bg-linear-to-t from-dark-900 via-dark-950/40 to-transparent"
-                  containerClassName="w-full h-[380px]"
+                  overlayClassName="bg-linear-to-t from-dark-900/60 via-transparent to-transparent"
+                  containerClassName="w-full h-[420px]"
                 />
-
-                {/* Overlay content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="glass rounded-2xl p-5">
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-2xl gradient-gold-btn flex items-center justify-center text-dark-950 font-bold text-lg shrink-0">
-                        AP
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-neutral-50 font-semibold text-lg">
-                          P W Gunawardana
-                        </h3>
-                        <p className="text-neutral-400 text-sm">
-                          Attorney-at-Law • Family Law
-                        </p>
-                        <div className="flex items-center gap-1 mt-1.5">
-                          {[...Array(5)].map((_, i) => (
-                            <svg
-                              key={i}
-                              className="w-3.5 h-3.5 text-gold-400 fill-current"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                            </svg>
-                          ))}
-                          <span className="text-neutral-500 text-xs ml-1">4.9 (128)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Floating badge — BASL Verified */}
