@@ -87,7 +87,7 @@ export default function HowItWorks() {
 
         {/* Role Tabs */}
         <div className="flex justify-center mb-16">
-          <div className="inline-flex bg-dark-600 rounded-2xl p-1.5 gap-1 border border-white/4">
+          <div className="inline-flex bg-dark-800 rounded-2xl p-1.5 gap-1 border border-white/5">
             {ROLES.map((r) => {
               const Icon = r.icon;
               const isActive = activeRole === r.key;

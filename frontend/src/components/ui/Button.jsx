@@ -11,7 +11,7 @@ const variants = {
   ghost:
     "bg-transparent hover:bg-white/6 text-neutral-300 hover:text-neutral-100",
   dark:
-    "bg-dark-500 hover:bg-dark-400 text-neutral-100 border border-white/6 shadow-lg shadow-black/30",
+    "bg-dark-600 hover:bg-dark-500 text-neutral-100 border border-white/6 shadow-lg shadow-black/20",
 };
 
 const sizes = {

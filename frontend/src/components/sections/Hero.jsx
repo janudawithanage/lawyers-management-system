@@ -33,8 +33,8 @@ export default function Hero() {
             backgroundSize: "80px 80px",
           }}
         />
-        {/* Bottom vignette */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-linear-to-t from-dark-950 to-transparent" />
+        {/* Bottom vignette — smooth transition to next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-linear-to-t from-dark-900 via-dark-950/80 to-transparent" />
       </div>
 
       <Container className="relative z-10 pt-28 pb-20">
@@ -124,7 +124,7 @@ export default function Hero() {
                   className="w-full h-[380px]"
                   loading="eager"
                   overlay
-                  overlayClassName="bg-linear-to-t from-dark-950 via-dark-950/40 to-transparent"
+                  overlayClassName="bg-linear-to-t from-dark-900 via-dark-950/40 to-transparent"
                   containerClassName="w-full h-[380px]"
                 />
 
@@ -137,7 +137,7 @@ export default function Hero() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-neutral-50 font-semibold text-lg">
-                          Ayesha Perera
+                          P W Gunawardana
                         </h3>
                         <p className="text-neutral-400 text-sm">
                           Attorney-at-Law • Family Law

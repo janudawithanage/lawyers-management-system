@@ -23,8 +23,8 @@ export default function WhyChoose() {
           decoding="async"
         />
         <div className="absolute inset-0 bg-linear-to-b from-dark-950 via-dark-950/95 to-dark-950" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gold-500/3 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/2 rounded-full blur-[120px]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gold-500/4 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/3 rounded-full blur-[120px]" />
       </div>
 
       <Container className="relative z-10">

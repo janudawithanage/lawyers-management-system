@@ -28,7 +28,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-dark-950/80 backdrop-blur-2xl border-b border-white/4 py-3"
+          ? "bg-dark-950/85 backdrop-blur-2xl border-b border-white/5 py-3 shadow-lg shadow-black/20"
           : "bg-transparent py-5"
       }`}
       role="banner"
@@ -72,7 +72,7 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-36 bg-dark-700 rounded-xl shadow-xl shadow-black/50 border border-white/8 overflow-hidden"
+                    className="absolute right-0 mt-2 w-36 bg-dark-700 backdrop-blur-xl rounded-xl shadow-xl shadow-black/40 border border-white/8 overflow-hidden"
                   >
                     {LANGUAGES.map((lang) => (
                       <button
@@ -137,7 +137,7 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-dark-800 border-l border-white/6 shadow-2xl z-50 lg:hidden overflow-y-auto"
+            className="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-dark-900 border-l border-white/6 shadow-2xl z-50 lg:hidden overflow-y-auto"
           >
             <div className="p-6">
               <div className="flex justify-end mb-8">

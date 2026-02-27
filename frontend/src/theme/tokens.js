@@ -21,15 +21,16 @@
 const theme = {
   /* ─────────────────────────── 1. COLOR SYSTEM ─────────────────────────── */
   colors: {
-    /** Surface / Background hierarchy (darkest → lightest) */
+    /** Layered Surface / Background hierarchy (Level 0 → Level 5) */
     bg: {
-      primary: "#000000",       // Page base — true black (BASL identity)
-      secondary: "#0a0a0a",     // Alternating sections
-      tertiary: "#0f0f0f",      // Elevated surfaces
-      elevated: "#141414",      // Cards, dropdowns
-      muted: "#1a1a1a",         // Input backgrounds
-      card: "rgba(255,255,255,0.02)",
-      cardHover: "rgba(255,255,255,0.04)",
+      primary: "#0B0B0C",       // Level 0 — Page base (deep charcoal)
+      secondary: "#121214",     // Level 1 — Alternating sections
+      tertiary: "#1A1A1D",      // Level 2 — Cards, panels
+      elevated: "#202024",      // Level 3 — Dropdowns, elevated cards
+      muted: "#28282D",         // Level 4 — Inputs, interactive
+      interactive: "#313136",   // Level 5 — Hover states
+      card: "rgba(26,26,29,0.6)",
+      cardHover: "rgba(32,32,36,0.8)",
     },
 
     /** BASL Gold — Primary accent (authority, prestige, trust) */
@@ -39,7 +40,7 @@ const theme = {
       200: "#f2d994",
       300: "#e8c15c",
       400: "#d4a84a",           // Primary interactive gold
-      500: "#c6a55e",           // Brand gold
+      500: "#c6a75e",           // Brand gold
       600: "#b08d3e",           // Hover state
       700: "#8f7030",
       800: "#6b5424",
@@ -59,7 +60,7 @@ const theme = {
       secondary: "#a3a3a3",     // Body text, descriptions
       muted: "#737373",         // Captions, timestamps
       disabled: "#525252",      // Disabled states
-      inverse: "#000000",       // Text on gold backgrounds
+      inverse: "#0B0B0C",       // Text on gold backgrounds
     },
 
     /** Border system */
@@ -67,16 +68,16 @@ const theme = {
       subtle: "rgba(255,255,255,0.06)",    // Default dividers
       default: "rgba(255,255,255,0.10)",   // Input borders
       strong: "rgba(255,255,255,0.15)",    // Active borders
-      gold: "rgba(198,165,94,0.20)",       // Gold accent borders
-      goldStrong: "rgba(198,165,94,0.40)", // Gold hover borders
+      gold: "rgba(198,167,94,0.20)",       // Gold accent borders
+      goldStrong: "rgba(198,167,94,0.40)", // Gold hover borders
     },
 
     /** Glassmorphism surfaces */
     glass: {
-      white: "rgba(255,255,255,0.03)",
-      whiteBorder: "rgba(255,255,255,0.06)",
-      gold: "rgba(198,165,94,0.06)",
-      goldBorder: "rgba(198,165,94,0.12)",
+      white: "rgba(255,255,255,0.04)",
+      whiteBorder: "rgba(255,255,255,0.07)",
+      gold: "rgba(198,167,94,0.06)",
+      goldBorder: "rgba(198,167,94,0.12)",
     },
 
     /** Semantic / Feedback */
@@ -161,27 +162,27 @@ const theme = {
   /* ─────────────────────────── 5. SHADOWS ─────────────────────────── */
   shadows: {
     /** Card resting state */
-    card: "0 4px 24px rgba(0,0,0,0.5)",
+    card: "0 4px 24px rgba(0,0,0,0.35)",
     /** Card hover state */
-    cardHover: "0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(198,165,94,0.1)",
+    cardHover: "0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(198,167,94,0.1)",
     /** Gold glow — premium accent */
-    gold: "0 0 20px rgba(198,165,94,0.15), 0 0 60px rgba(198,165,94,0.05)",
+    gold: "0 0 20px rgba(198,167,94,0.15), 0 0 60px rgba(198,167,94,0.05)",
     /** Gold button shadow */
-    button: "0 4px 16px rgba(198,165,94,0.25)",
+    button: "0 4px 16px rgba(198,167,94,0.25)",
     /** Dropdown / popover */
-    dropdown: "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)",
+    dropdown: "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)",
     /** Modal overlay */
-    modal: "0 24px 64px rgba(0,0,0,0.7)",
+    modal: "0 24px 64px rgba(0,0,0,0.6)",
     /** Inner shadow (inputs) */
     inner: "inset 0 2px 4px rgba(0,0,0,0.3)",
   },
 
   /* ─────────────────────────── 6. TRANSITIONS ─────────────────────────── */
   transition: {
-    fast: "150ms ease",
-    base: "200ms ease",
-    normal: "300ms ease",
-    slow: "500ms ease",
+    fast: "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+    base: "200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    normal: "300ms cubic-bezier(0.4, 0, 0.2, 1)",
+    slow: "500ms cubic-bezier(0.4, 0, 0.2, 1)",
     spring: "500ms cubic-bezier(0.34, 1.56, 0.64, 1)",
   },
 

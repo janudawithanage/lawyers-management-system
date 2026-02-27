@@ -63,7 +63,7 @@ export default function Features() {
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-linear-to-r from-dark-900 via-dark-900/80 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-r from-dark-900 via-dark-900/85 to-transparent" />
             <div className="absolute inset-0 flex items-center p-8 sm:p-12">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-50 mb-2">

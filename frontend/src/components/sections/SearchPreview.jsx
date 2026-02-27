@@ -25,7 +25,7 @@ function SelectField({ icon: Icon, placeholder, options, value, onChange }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full pl-12 pr-10 py-4 rounded-xl bg-dark-600 border border-white/6 text-neutral-200 text-sm font-medium appearance-none cursor-pointer hover:border-gold-500/30 focus:border-gold-500/50 focus:ring-2 focus:ring-gold-500/20 transition-all outline-none"
+        className="w-full pl-12 pr-10 py-4 rounded-xl bg-dark-700 border border-white/6 text-neutral-200 text-sm font-medium appearance-none cursor-pointer hover:border-gold-500/30 focus:border-gold-500/50 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 outline-none"
         aria-label={placeholder}
       >
         <option value="">{placeholder}</option>
@@ -128,7 +128,7 @@ export default function SearchPreview() {
           viewport={{ once: true }}
           className="max-w-5xl mx-auto mb-12"
         >
-          <div className="bg-dark-700/50 rounded-2xl shadow-xl shadow-black/30 border border-white/6 p-3">
+          <div className="bg-dark-800/70 rounded-2xl shadow-xl shadow-black/20 border border-white/6 p-3 backdrop-blur-sm">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <SelectField
                 icon={Briefcase}

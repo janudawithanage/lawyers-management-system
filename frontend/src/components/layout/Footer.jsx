@@ -42,7 +42,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-dark-950 pt-16 pb-8 border-t border-white/4"
+      className="bg-dark-900 pt-16 pb-8 border-t border-white/5"
       role="contentinfo"
     >
       <Container>

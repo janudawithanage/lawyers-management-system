@@ -22,14 +22,14 @@ export default function CallToAction() {
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-dark-950/90" />
+            <div className="absolute inset-0 bg-dark-950/88" />
             <div className="absolute inset-0 bg-linear-to-br from-dark-950/50 to-transparent" />
             <div className="absolute -top-20 -right-20 w-80 h-80 bg-gold-500/8 rounded-full blur-[100px]" />
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gold-500/5 rounded-full blur-[100px]" />
             <div
               className="absolute inset-0 opacity-3"
               style={{
-                backgroundImage: `radial-gradient(circle, rgba(198,165,94,0.3) 1px, transparent 1px)`,
+                backgroundImage: `radial-gradient(circle, rgba(198,167,94,0.3) 1px, transparent 1px)`,
                 backgroundSize: "24px 24px",
               }}
             />

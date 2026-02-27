@@ -17,8 +17,8 @@ const variantClasses = {
   default: "surface-card hover:surface-card-hover",
   gold: "glass-gold hover:bg-gold-500/8",
   elevated:
-    "bg-dark-600/50 border border-white/6 shadow-xl shadow-black/30 hover:border-gold-500/20 hover:shadow-gold-500/5",
-  flat: "bg-dark-700/50 border border-white/6",
+    "bg-dark-700/60 border border-white/6 shadow-xl shadow-black/20 hover:border-gold-500/20 hover:shadow-gold-500/5 backdrop-blur-sm",
+  flat: "bg-dark-800/60 border border-white/6",
 };
 
 const paddingClasses = {
