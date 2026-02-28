@@ -1,0 +1,200 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * SL-LMS CUSTOM ANIMATIONS
+ * Premium animation utilities for authentication pages
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* Add these animations to your global CSS or App.css */
+
+/* Fade In Animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Slide Up Animation */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Slide Down Animation (for conditional fields) */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Slide In (for accent elements) */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    width: 0;
+  }
+  to {
+    opacity: 1;
+    width: 4rem;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Shake Animation (for errors) */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse Animation (enhanced) */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Scale on Hover */
+.hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Button Glow Effect */
+@keyframes button-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(198, 167, 94, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(198, 167, 94, 0.4);
+  }
+}
+
+.button-glow-effect:hover {
+  animation: button-glow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Gradient Animation for Buttons */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Focus Ring Animation */
+@keyframes focus-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.focus-ring-animate {
+  animation: focus-ring 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Stagger children animation utility */
+.stagger-children > * {
+  animation-delay: calc(var(--stagger) * 100ms);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-slide-in,
+  .animate-shake,
+  .animate-pulse,
+  .animate-spin,
+  .gradient-animate,
+  .focus-ring-animate {
+    animation: none !important;
+  }
+  
+  .hover-scale:hover {
+    transform: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
