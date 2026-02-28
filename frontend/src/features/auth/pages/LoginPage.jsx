@@ -6,15 +6,18 @@
  */
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthLayout } from "../../../layouts/AuthLayout";
 import { Input } from "../components/Input";
 import { Button } from "../../../components/ui";
 import { validateEmail, validatePassword } from "../validation/authValidation";
-import { authService } from "../services/authService";
+import { useAuth, getDashboardPath } from "@context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login: authLogin, isAuthenticated, getDashboardPath: getUserDashboard } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,6 +26,13 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showDevPanel, setShowDevPanel] = useState(false);
+
+  // If already authenticated, redirect to dashboard
+  if (isAuthenticated) {
+    const dest = getUserDashboard();
+    navigate(dest, { replace: true });
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -55,6 +65,18 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ── Mock credentials for dev quick-fill ──
+  const MOCK_ACCOUNTS = [
+    { label: "Client", email: "test@example.com", password: "Test1234", color: "blue" },
+    { label: "Lawyer", email: "lawyer@example.com", password: "Lawyer1234", color: "emerald" },
+    { label: "Admin", email: "admin@example.com", password: "Admin1234", color: "red" },
+  ];
+
+  const handleQuickFill = (account) => {
+    setFormData({ email: account.email, password: account.password, rememberMe: false });
+    setErrors({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,23 +84,17 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const response = await authService.login({
+      const response = await authLogin({
         email: formData.email,
         password: formData.password,
         rememberMe: formData.rememberMe,
       });
 
-      // Store token (basic implementation - enhance with secure storage)
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-
-      // Redirect based on role
-      const dashboardRoutes = {
-        client: "/dashboard/client",
-        lawyer: "/dashboard/lawyer",
-        admin: "/dashboard/admin",
-      };
-      navigate(dashboardRoutes[response.user.role] || "/dashboard");
+      // Redirect to the page they originally tried to visit,
+      // or to their role-specific dashboard.
+      const from = location.state?.from;
+      const destination = from || getDashboardPath(response.user.role);
+      navigate(destination, { replace: true });
     } catch (error) {
       setErrors({
         submit: error.message || "Login failed. Please check your credentials.",
@@ -259,6 +275,49 @@ export default function LoginPage() {
               Create Account
             </Link>
           </p>
+
+          {/* ── Dev Quick-Fill (hidden toggle) ── */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setShowDevPanel((prev) => !prev)}
+              className="mx-auto flex items-center gap-1.5 text-[11px] text-neutral-600 hover:text-neutral-400 transition-colors duration-200"
+              title="Toggle dev quick-fill"
+            >
+              <span className="text-sm">⚡</span>
+              <span>{showDevPanel ? "Hide" : "Dev"} Quick Login</span>
+            </button>
+
+            {showDevPanel && (
+              <div className="mt-3 p-3 rounded-xl bg-dark-800/60 border border-white/5 animate-fade-in">
+                <p className="text-[10px] uppercase tracking-widest text-neutral-600 mb-2.5 text-center">
+                  Mock Accounts — Click to fill
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {MOCK_ACCOUNTS.map((acct) => {
+                    const colorMap = {
+                      blue: "bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20",
+                      emerald: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20",
+                      red: "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20",
+                    };
+                    return (
+                      <button
+                        key={acct.label}
+                        type="button"
+                        onClick={() => handleQuickFill(acct)}
+                        className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg border text-xs font-medium transition-all duration-200 cursor-pointer ${colorMap[acct.color]}`}
+                      >
+                        <span className="text-base">
+                          {acct.color === "blue" ? "👤" : acct.color === "emerald" ? "⚖️" : "🛡️"}
+                        </span>
+                        <span>{acct.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </form>
       </div>
     </AuthLayout>

@@ -55,6 +55,20 @@ export const authService = {
       };
     }
 
+    // Mock admin login
+    if (email === "admin@example.com" && password === "Admin1234") {
+      return {
+        token: "mock-jwt-token-" + Date.now(),
+        user: {
+          id: "user-789",
+          email: email,
+          fullName: "Platform Admin",
+          role: "admin",
+          verified: true,
+        },
+      };
+    }
+
     throw new Error("Invalid email or password");
 
     /* 
@@ -135,8 +149,8 @@ export const authService = {
    */
   async logout() {
     await delay(500);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // Token cleanup is handled by AuthContext.logout() → tokenStorage.clearSession()
+    // No direct storage access here.
 
     /* 
     // Actual API implementation:
@@ -161,14 +175,9 @@ export const authService = {
    * Get current user
    */
   async getCurrentUser() {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return null;
-
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
+    // Session restoration is now handled by AuthContext hydration
+    // via tokenStorage. This method is kept for future backend integration.
+    return null;
 
     /* 
     // Actual API implementation:

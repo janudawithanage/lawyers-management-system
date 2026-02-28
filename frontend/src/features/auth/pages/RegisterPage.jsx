@@ -17,10 +17,11 @@ import {
   validatePhone,
   validateName,
 } from "../validation/authValidation";
-import { authService } from "../services/authService";
+import { useAuth, getDashboardPath } from "@context/AuthContext";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register: authRegister } = useAuth();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -163,18 +164,11 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      const response = await authService.register(formData);
+      const response = await authRegister(formData);
 
-      // Store token
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-
-      // Redirect to appropriate dashboard
-      const dashboardRoutes = {
-        client: "/dashboard/client",
-        lawyer: "/dashboard/lawyer",
-      };
-      navigate(dashboardRoutes[formData.role] || "/dashboard");
+      // Redirect to role-specific dashboard
+      const destination = getDashboardPath(response.user.role);
+      navigate(destination, { replace: true });
     } catch (error) {
       setErrors({
         submit: error.message || "Registration failed. Please try again.",
