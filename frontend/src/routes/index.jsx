@@ -11,10 +11,10 @@ import { PublicLayout } from "@layouts";
 
 // ── Lazy-loaded pages ──
 const LandingPage = lazy(() => import("@pages/LandingPage"));
+const LoginPage = lazy(() => import("@features/auth/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@features/auth/pages/RegisterPage"));
 
 // Future pages (uncomment when ready):
-// const LoginPage       = lazy(() => import("@features/auth/LoginPage"));
-// const RegisterPage    = lazy(() => import("@features/auth/RegisterPage"));
 // const LawyerSearch    = lazy(() => import("@features/lawyers/LawyerSearch"));
 // const LawyerProfile   = lazy(() => import("@features/lawyers/LawyerProfile"));
 // const ClientDashboard = lazy(() => import("@features/dashboard/ClientDashboard"));
@@ -42,6 +42,7 @@ function SuspenseWrapper({ children }) {
 // ── Route tree ──
 const router = createBrowserRouter([
   {
+    path: "/",
     element: <PublicLayout />,
     children: [
       {
@@ -53,11 +54,27 @@ const router = createBrowserRouter([
         ),
       },
       // Future public routes:
-      // { path: "auth/login",    element: <SuspenseWrapper><LoginPage /></SuspenseWrapper> },
-      // { path: "auth/register", element: <SuspenseWrapper><RegisterPage /></SuspenseWrapper> },
       // { path: "lawyers",       element: <SuspenseWrapper><LawyerSearch /></SuspenseWrapper> },
       // { path: "lawyers/:id",   element: <SuspenseWrapper><LawyerProfile /></SuspenseWrapper> },
     ],
+  },
+
+  // Auth routes (standalone — use AuthLayout, no Navbar/Footer)
+  {
+    path: "login",
+    element: (
+      <SuspenseWrapper>
+        <LoginPage />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "register",
+    element: (
+      <SuspenseWrapper>
+        <RegisterPage />
+      </SuspenseWrapper>
+    ),
   },
 
   // Future: Authenticated dashboard routes

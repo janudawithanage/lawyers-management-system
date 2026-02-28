@@ -77,7 +77,7 @@ export default function Hero() {
                 <Search className="w-5 h-5" />
                 Find a Lawyer
               </Button>
-              <Button variant="secondary" size="lg" href="#register">
+              <Button variant="secondary" size="lg" href="/register">
                 Register as Lawyer
                 <ArrowRight className="w-4 h-4" />
               </Button>

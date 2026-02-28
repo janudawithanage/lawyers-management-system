@@ -207,7 +207,7 @@ export default function SearchPreview() {
           viewport={{ once: true }}
           className="text-center mt-14"
         >
-          <Button variant="outline" size="md" href="#register">
+          <Button variant="outline" size="md" href="/register">
             View All Lawyers
             <ArrowRight className="w-4 h-4" />
           </Button>

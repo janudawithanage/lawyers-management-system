@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { Link } from "react-router-dom";
 import { cn } from "../../utils/cn";
 
 const variants = {
@@ -44,6 +45,14 @@ const Button = forwardRef(
     );
 
     if (href) {
+      // Use React Router Link for internal routes, plain <a> for external/hash links
+      if (href.startsWith("/")) {
+        return (
+          <Link ref={ref} to={href} className={classes} {...props}>
+            {children}
+          </Link>
+        );
+      }
       return (
         <a ref={ref} href={href} className={classes} {...props}>
           {children}

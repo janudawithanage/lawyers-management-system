@@ -95,10 +95,10 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Button variant="ghost" size="sm" href="#login">
+            <Button variant="ghost" size="sm" href="/login">
               Login
             </Button>
-            <Button variant="primary" size="sm" href="#register">
+            <Button variant="primary" size="sm" href="/register">
               Register
             </Button>
           </div>
@@ -188,10 +188,10 @@ export default function Navbar() {
               </div>
 
               <div className="space-y-3 px-4">
-                <Button variant="secondary" size="md" className="w-full" href="#login">
+                <Button variant="secondary" size="md" className="w-full" href="/login" onClick={() => setIsMobileOpen(false)}>
                   Login
                 </Button>
-                <Button variant="primary" size="md" className="w-full" href="#register">
+                <Button variant="primary" size="md" className="w-full" href="/register" onClick={() => setIsMobileOpen(false)}>
                   Register
                 </Button>
               </div>

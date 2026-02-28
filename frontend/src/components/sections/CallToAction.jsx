@@ -60,7 +60,7 @@ export default function CallToAction() {
                 Find a Lawyer Now
                 <ArrowRight className="w-5 h-5" />
               </Button>
-              <Button variant="secondary" size="xl" href="#register">
+              <Button variant="secondary" size="xl" href="/register">
                 Register as a Lawyer
               </Button>
             </div>
