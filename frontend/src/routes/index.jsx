@@ -1,108 +1,13 @@
 /**
- * SL-LMS Route Definitions
+ * SL-LMS Route Definitions — Barrel Export
  *
- * Centralised routing with code-splitting via React.lazy.
- * Structured for role-based access and feature-based growth.
+ * Re-exports the centralised route tree and utilities.
+ * The actual route configuration lives in:
+ *   • AppRoutes.jsx  — component tree
+ *   • routeConfig.js — path constants & role mappings
  */
 
-import { lazy, Suspense } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { PublicLayout } from "@layouts";
-
-// ── Lazy-loaded pages ──
-const LandingPage = lazy(() => import("@pages/LandingPage"));
-const LoginPage = lazy(() => import("@features/auth/pages/LoginPage"));
-const RegisterPage = lazy(() => import("@features/auth/pages/RegisterPage"));
-
-// Future pages (uncomment when ready):
-// const LawyerSearch    = lazy(() => import("@features/lawyers/LawyerSearch"));
-// const LawyerProfile   = lazy(() => import("@features/lawyers/LawyerProfile"));
-// const ClientDashboard = lazy(() => import("@features/dashboard/ClientDashboard"));
-// const LawyerDashboard = lazy(() => import("@features/dashboard/LawyerDashboard"));
-// const AdminDashboard  = lazy(() => import("@features/dashboard/AdminDashboard"));
-// const NotFoundPage    = lazy(() => import("@pages/NotFoundPage"));
-
-/** Page loading fallback */
-function PageLoader() {
-  return (
-    <div className="min-h-screen bg-dark-950 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 rounded-xl gradient-gold-btn animate-pulse" />
-        <p className="text-sm text-neutral-500 font-medium tracking-wide">Loading…</p>
-      </div>
-    </div>
-  );
-}
-
-/** Suspense wrapper */
-function SuspenseWrapper({ children }) {
-  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
-}
-
-// ── Route tree ──
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <PublicLayout />,
-    children: [
-      {
-        index: true,
-        element: (
-          <SuspenseWrapper>
-            <LandingPage />
-          </SuspenseWrapper>
-        ),
-      },
-      // Future public routes:
-      // { path: "lawyers",       element: <SuspenseWrapper><LawyerSearch /></SuspenseWrapper> },
-      // { path: "lawyers/:id",   element: <SuspenseWrapper><LawyerProfile /></SuspenseWrapper> },
-    ],
-  },
-
-  // Auth routes (standalone — use AuthLayout, no Navbar/Footer)
-  {
-    path: "login",
-    element: (
-      <SuspenseWrapper>
-        <LoginPage />
-      </SuspenseWrapper>
-    ),
-  },
-  {
-    path: "register",
-    element: (
-      <SuspenseWrapper>
-        <RegisterPage />
-      </SuspenseWrapper>
-    ),
-  },
-
-  // Future: Authenticated dashboard routes
-  // {
-  //   element: <DashboardLayout allowedRoles={["client"]} />,
-  //   children: [
-  //     { path: "dashboard",              element: <SuspenseWrapper><ClientDashboard /></SuspenseWrapper> },
-  //     { path: "dashboard/cases",        element: <SuspenseWrapper><CasesPage /></SuspenseWrapper> },
-  //     { path: "dashboard/appointments", element: <SuspenseWrapper><AppointmentsPage /></SuspenseWrapper> },
-  //   ],
-  // },
-  // {
-  //   element: <DashboardLayout allowedRoles={["lawyer"]} />,
-  //   children: [
-  //     { path: "lawyer/dashboard", element: <SuspenseWrapper><LawyerDashboard /></SuspenseWrapper> },
-  //   ],
-  // },
-  // {
-  //   element: <DashboardLayout allowedRoles={["admin", "super_admin"]} />,
-  //   children: [
-  //     { path: "admin/dashboard", element: <SuspenseWrapper><AdminDashboard /></SuspenseWrapper> },
-  //   ],
-  // },
-
-  // 404 catch-all
-  // { path: "*", element: <SuspenseWrapper><NotFoundPage /></SuspenseWrapper> },
-]);
-
-export default function AppRouter() {
-  return <RouterProvider router={router} />;
-}
+export { default } from "./AppRoutes";
+export { PATHS, DASHBOARD_ROUTES, resolveDashboard, ROUTE_TREE } from "./routeConfig";
+export { default as ProtectedRoute } from "./ProtectedRoute";
+export { default as RoleRoute } from "./RoleRoute";

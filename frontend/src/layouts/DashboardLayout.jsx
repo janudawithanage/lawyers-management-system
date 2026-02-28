@@ -1,34 +1,44 @@
 /**
- * DashboardLayout — Wrapper for authenticated dashboard pages.
+ * ══════════════════════════════════════════════════════════════
+ * SL-LMS DASHBOARD LAYOUT
+ * Wrapper for all authenticated dashboard pages.
  *
- * Future: Sidebar navigation, top bar, breadcrumbs, role-based menus.
- * Currently a placeholder for architecture readiness.
+ * Authentication and role checks are handled OUTSIDE this component
+ * by ProtectedRoute and RoleRoute in the route tree.
+ * This layout focuses purely on UI structure.
+ *
+ * Future: Sidebar navigation, top bar, breadcrumbs, role-based menus,
+ *         notifications bell, command palette.
+ * ══════════════════════════════════════════════════════════════
  */
 
-import { Outlet, Navigate } from "react-router-dom";
-import { useAuth } from "@context";
+import { Outlet } from "react-router-dom";
+import { useAuth } from "@context/AuthContext";
 
-export default function DashboardLayout({ allowedRoles = [] }) {
-  const { isAuthenticated, user } = useAuth();
-
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
-
-  // Role-based access control
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+export default function DashboardLayout() {
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-dark-950 text-neutral-100 flex">
-      {/* Future: <Sidebar /> */}
+      {/* ── Sidebar (future) ── */}
+      {/* <DashboardSidebar role={user?.role} /> */}
+
       <div className="flex-1 flex flex-col">
-        {/* Future: <DashboardTopBar /> */}
+        {/* ── Top Bar (future) ── */}
+        {/* <DashboardTopBar user={user} /> */}
+
+        {/* ── Main Content ── */}
         <main className="flex-1 p-6 lg:p-8">
           <Outlet />
         </main>
+
+        {/* ── Footer ── */}
+        <footer className="px-6 py-4 border-t border-white/5">
+          <p className="text-xs text-neutral-600 text-center">
+            © 2026 SL-LMS • Logged in as{" "}
+            <span className="text-neutral-400 capitalize">{user?.role}</span>
+          </p>
+        </footer>
       </div>
     </div>
   );
