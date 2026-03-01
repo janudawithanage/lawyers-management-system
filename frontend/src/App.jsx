@@ -2,28 +2,28 @@
  * SL-LMS — Root Application Component
  *
  * Wraps the entire app with:
- *  1. BrowserRouter (react-router-dom — context-compatible)
- *  2. ThemeProvider (dark/light mode)
- *  3. AuthProvider (authentication state)
- *  4. ErrorBoundary (graceful error handling)
- *  5. ScrollToTop (reset scroll on navigation)
- *  6. AppRoutes (centralised route tree)
+ *  1. ThemeProvider (dark/light mode)
+ *  2. AuthProvider (authentication state)
+ *  3. ErrorBoundary (graceful error handling)
+ *  4. RouterProvider (react-router-dom)
  */
 
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, AuthProvider } from "./context";
-import { ErrorBoundary, ScrollToTop } from "./components/common";
-import AppRoutes from "./routes/AppRoutes";
+import { ErrorBoundary } from "./components/common";
+import { AppStoreProvider } from "./store/globalStore";
+import AppRouter from "./routes";
 
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <ErrorBoundary>
-            <ScrollToTop />
-            <AppRoutes />
-          </ErrorBoundary>
+          <AppStoreProvider>
+            <ErrorBoundary>
+              <AppRouter />
+            </ErrorBoundary>
+          </AppStoreProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

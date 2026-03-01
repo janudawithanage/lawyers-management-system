@@ -30,9 +30,9 @@ export const authService = {
       return {
         token: "mock-jwt-token-" + Date.now(),
         user: {
-          id: "user-123",
+          id: "USR-2026-0001",
           email: email,
-          fullName: "Test User",
+          fullName: "Ashan Bandara",
           role: "client",
           verified: true,
         },
@@ -44,13 +44,13 @@ export const authService = {
       return {
         token: "mock-jwt-token-" + Date.now(),
         user: {
-          id: "user-456",
+          id: "LWR-003",
           email: email,
-          fullName: "John Attorney",
+          fullName: "Atty. Ranjan de Silva",
           role: "lawyer",
           verified: true,
-          barNumber: "BAR-2024-0001",
-          specialization: "criminal",
+          barNumber: "BASL/2015/3284",
+          specialization: "Civil Law",
         },
       };
     }
