@@ -12,6 +12,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   CreditCard,
@@ -55,13 +56,13 @@ export default function PaymentModal({
 
   if (!isOpen || !payment) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-dark-800 border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg max-h-[90vh] bg-dark-800 border border-white/[0.08] rounded-2xl shadow-2xl overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
@@ -99,23 +100,23 @@ export default function PaymentModal({
 
               {/* Payment Details */}
               <div className="space-y-3 p-4 rounded-xl bg-dark-900/60 border border-white/[0.06]">
-                <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Description</span>
-                  <span className="text-neutral-200 text-right max-w-[200px]">{payment.description}</span>
+                <div className="flex items-start justify-between gap-4 text-sm">
+                  <span className="text-neutral-500 shrink-0">Description</span>
+                  <span className="text-neutral-200 text-right">{payment.description}</span>
                 </div>
                 {appointment && (
                   <>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Lawyer</span>
-                      <span className="text-neutral-200">{appointment.lawyerName}</span>
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-neutral-500 shrink-0">Lawyer</span>
+                      <span className="text-neutral-200 text-right">{appointment.lawyerName}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Date & Time</span>
-                      <span className="text-neutral-200">{appointment.selectedDate} • {appointment.selectedTime}</span>
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-neutral-500 shrink-0">Date & Time</span>
+                      <span className="text-neutral-200 text-right">{appointment.selectedDate} • {appointment.selectedTime}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-neutral-500">Type</span>
-                      <span className="text-neutral-200 capitalize">{appointment.consultationType}</span>
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-neutral-500 shrink-0">Type</span>
+                      <span className="text-neutral-200 capitalize text-right">{appointment.consultationType}</span>
                     </div>
                   </>
                 )}
@@ -148,8 +149,8 @@ export default function PaymentModal({
               </div>
 
               {/* Security Notice */}
-              <div className="flex items-center gap-2 text-[11px] text-neutral-600">
-                <Lock className="w-3.5 h-3.5" />
+              <div className="flex items-start gap-2 text-[11px] text-neutral-600">
+                <Lock className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                 <span>256-bit SSL encryption • PCI DSS compliant • Your data is secure</span>
               </div>
 
@@ -210,20 +211,20 @@ export default function PaymentModal({
                   <Receipt className="w-4 h-4 text-gold-400" />
                   <span className="text-sm font-semibold text-neutral-200">Payment Receipt</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500">Transaction ID</span>
-                  <span className="text-neutral-300 font-mono">{payment.id?.toUpperCase()}</span>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-neutral-500 shrink-0">Transaction ID</span>
+                  <span className="text-neutral-300 font-mono text-right break-all">{payment.id?.toUpperCase()}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500">Amount</span>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-neutral-500 shrink-0">Amount</span>
                   <span className="text-emerald-400 font-semibold">LKR {payment.amount?.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500">Date</span>
-                  <span className="text-neutral-300">{new Date().toLocaleString("en-LK")}</span>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-neutral-500 shrink-0">Date</span>
+                  <span className="text-neutral-300 text-right">{new Date().toLocaleString("en-LK")}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500">Status</span>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-neutral-500 shrink-0">Status</span>
                   <span className="text-emerald-400 font-semibold">✓ Confirmed</span>
                 </div>
               </div>
@@ -262,6 +263,7 @@ export default function PaymentModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

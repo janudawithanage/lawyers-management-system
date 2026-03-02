@@ -8,6 +8,7 @@
  */
 
 import { useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -94,7 +95,7 @@ export default function FollowUpBookingModal({ isOpen, onClose, caseData }) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
@@ -311,7 +312,8 @@ export default function FollowUpBookingModal({ isOpen, onClose, caseData }) {
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
