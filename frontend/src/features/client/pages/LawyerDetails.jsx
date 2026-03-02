@@ -135,7 +135,7 @@ export default function LawyerDetails() {
   };
 
   const handleChat = (lawyer) => {
-    console.log("Chat with:", lawyer.name);
+    // Future: navigate to messages with lawyer
   };
 
   // ── Success rate calc ──────────────────────────────────────

@@ -26,8 +26,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useAppStore } from "@/store/globalStore";
-
-const MOCK_LAWYER_ID = "LWR-003";
+import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 
 export default function LawyerDocuments() {
   const { cases } = useAppStore();

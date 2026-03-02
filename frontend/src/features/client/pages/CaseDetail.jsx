@@ -77,7 +77,7 @@ const FILE_TYPE_CONFIG = {
   zip: { color: "text-neutral-400", bg: "bg-neutral-500/10", label: "ZIP" },
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 function getFileExtension(name) {
   return name?.split(".").pop()?.toLowerCase() || "file";
@@ -846,7 +846,7 @@ export default function CaseDetail() {
   const {
     cases,
     payments,
-    terminateCase,
+    endCase,
     confirmPayment,
     addDocumentToCase,
     removeDocumentFromCase,
@@ -885,11 +885,11 @@ export default function CaseDetail() {
     const reason = endReasonCategory
       ? `[${endReasonCategory}] ${endReason}`.trim()
       : endReason;
-    terminateCase(caseId, reason);
+    endCase(caseId, reason);
     setShowEndForm(false);
     setEndReason("");
     setEndReasonCategory("");
-  }, [terminateCase, caseId, endReason, endReasonCategory]);
+  }, [endCase, caseId, endReason, endReasonCategory]);
 
   const handleUploadDocument = useCallback(
     (doc) => {

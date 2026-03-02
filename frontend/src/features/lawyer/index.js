@@ -18,14 +18,7 @@ export { default as LawyerProfile } from "./pages/LawyerProfile";
 export { default as LawyerSettings } from "./pages/LawyerSettings";
 export { default as LawyerHelpSupport } from "./pages/LawyerHelpSupport";
 
-// Components
-export { default as SummaryHeader } from "./components/SummaryHeader";
-export { default as StatCard } from "./components/StatCard";
-export { default as CaseTable } from "./components/CaseTable";
-export { default as LawyerAppointmentItem } from "./components/AppointmentItem";
-export { default as RequestItem } from "./components/RequestItem";
-export { default as PerformanceWidget } from "./components/PerformanceWidget";
-export { default as LawyerQuickActionCard } from "./components/QuickActionCard";
+// Components (live components only)
 
 // Hooks
 export { default as useLawyerStore } from "./hooks/useLawyerStore";

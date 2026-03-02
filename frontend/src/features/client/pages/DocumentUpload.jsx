@@ -197,7 +197,7 @@ export default function DocumentUpload() {
             // Add to store
             addDocumentToCase(selectedCaseId, {
               name: upload.file.name,
-              type: upload.file.type,
+              type: upload.file.name.split(".").pop()?.toLowerCase() || "file",
               size: upload.file.size,
               uploadedBy: "Client",
             });

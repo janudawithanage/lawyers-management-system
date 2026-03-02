@@ -4,7 +4,6 @@
 
 // Pages
 export { default as ClientDashboard } from "./pages/ClientDashboard";
-export { default as SearchLawyers } from "./pages/SearchLawyers";
 export { default as AppointmentBooking } from "./pages/AppointmentBooking";
 export { default as MyAppointments } from "./pages/MyAppointmentsLifecycle";
 export { default as MyCases } from "./pages/MyCasesLifecycle";
@@ -18,18 +17,10 @@ export { default as Messages } from "./pages/Messages";
 export { default as MyProfile } from "./pages/MyProfile";
 export { default as HelpSupport } from "./pages/HelpSupport";
 
-// Components — Dashboard
-export { default as OverviewCard } from "./components/OverviewCard";
-export { default as QuickActionCard } from "./components/QuickActionCard";
-export { default as AppointmentItem } from "./components/AppointmentItem";
-export { default as CaseCard } from "./components/CaseCard";
-export { default as ActivityItem } from "./components/ActivityItem";
+// Components — Dashboard (live components only)
 
 // Components — Feature
 export { default as LawyerCard } from "./components/LawyerCard";
-export { default as AppointmentCard } from "./components/AppointmentCard";
-export { default as CaseCardFull } from "./components/CaseCardFull";
-export { default as DocumentItem } from "./components/DocumentItem";
 export { default as Stepper } from "./components/Stepper";
 export { default as ProfileForm } from "./components/ProfileForm";
 export { default as RatingStars } from "./components/RatingStars";

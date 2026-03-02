@@ -124,6 +124,8 @@ export default function useLawyerStore() {
     addMessageToCase: store.addMessageToCase,
     confirmPayment: store.confirmPayment,
     dismissNotification: store.dismissNotification,
+    markNotificationRead: store.markNotificationRead,
+    markAllNotificationsRead: store.markAllNotificationsRead,
 
     // Config
     config: store.config,

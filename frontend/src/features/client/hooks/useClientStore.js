@@ -106,8 +106,11 @@ export default function useClientStore() {
     addDocumentToCase: store.addDocumentToCase,
     removeDocumentFromCase: store.removeDocumentFromCase,
     addMessageToCase: store.addMessageToCase,
+    endCase: store.endCase,
     terminateCase: store.terminateCase,
     dismissNotification: store.dismissNotification,
+    markNotificationRead: store.markNotificationRead,
+    markAllNotificationsRead: store.markAllNotificationsRead,
 
     // Config
     config: store.config,

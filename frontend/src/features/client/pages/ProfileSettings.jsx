@@ -62,7 +62,6 @@ export default function ProfileSettings() {
   }, []);
 
   const handleSave = (formData) => {
-    console.log("Profile saved:", formData);
     // Future: PUT /api/v1/client/profile
   };
 

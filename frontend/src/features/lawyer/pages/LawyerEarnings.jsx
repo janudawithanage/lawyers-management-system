@@ -25,8 +25,7 @@ import {
   Download,
 } from "lucide-react";
 import { useAppStore } from "@/store/globalStore";
-
-const MOCK_LAWYER_ID = "LWR-003";
+import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 
 const FMT = (n) => `LKR ${Number(n || 0).toLocaleString("en-LK")}`;
 
