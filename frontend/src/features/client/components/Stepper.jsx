@@ -84,7 +84,7 @@ export default function Stepper({ steps, currentStep, className = "" }) {
                 }}
                 className="mt-2 text-[11px] font-medium text-center max-w-[80px] leading-tight hidden sm:block"
               >
-                {step}
+                {typeof step === "object" ? step.label : step}
               </motion.p>
             </div>
 

@@ -13,6 +13,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -56,8 +57,9 @@ const CONSULTATION_TYPES = [
 
 const CASE_TYPES = [
   "Criminal Law", "Family Law", "Property Law", "Corporate Law",
-  "Labour Law", "Tax Law", "Civil Litigation", "Immigration",
-  "Intellectual Property", "Insurance Law", "Other",
+  "Constitutional Law", "Labour Law", "Tax Law", "Civil Litigation",
+  "Immigration", "Intellectual Property", "Insurance Law",
+  "Environmental Law", "Banking & Finance", "Human Rights Law", "Other",
 ];
 
 const URGENCY_LEVELS = [
@@ -108,7 +110,7 @@ export default function AppointmentBooking() {
   }, []);
 
   const canProceed = useMemo(() => {
-    if (step === 0) return form.consultationType && form.caseType && form.description.trim().length >= 10;
+    if (step === 0) return form.consultationType && form.caseType && form.description.trim().length >= 3;
     if (step === 1) return form.selectedDate && form.selectedTime;
     return true;
   }, [step, form]);
@@ -194,7 +196,7 @@ export default function AppointmentBooking() {
       </motion.div>
 
       {/* Stepper */}
-      <Stepper steps={STEPS} current={step} className="mb-8" />
+      <Stepper steps={STEPS} currentStep={step} className="mb-8" />
 
       <AnimatePresence mode="wait">
         {/* ═══════════════════════════════════════════════════════
@@ -204,10 +206,18 @@ export default function AppointmentBooking() {
           <motion.div key="step-0" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
             {/* Lawyer Card */}
             <div className="flex items-center gap-4 p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-              <img src={lawyer.avatar} alt={lawyer.name} className="w-14 h-14 rounded-xl object-cover border border-white/[0.08]" />
+              <div className="w-14 h-14 rounded-xl border border-white/[0.08] overflow-hidden flex-shrink-0 bg-linear-to-br from-gold-500/20 to-gold-600/10 flex items-center justify-center">
+                {(lawyer.profile_picture || lawyer.avatar) ? (
+                  <img src={lawyer.profile_picture || lawyer.avatar} alt={lawyer.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-lg font-bold text-gold-400">
+                    {lawyer.name.replace(/^Atty\.\s*/, "").split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
               <div>
                 <p className="text-sm font-semibold text-neutral-200">{lawyer.name}</p>
-                <p className="text-xs text-neutral-500">{lawyer.specialization} • {lawyer.experience}</p>
+                <p className="text-xs text-neutral-500">{lawyer.specialization} • {lawyer.experience} years</p>
                 <p className="text-xs text-gold-400 font-semibold mt-0.5">LKR {(lawyer.consultationFee || 5000).toLocaleString()} / session</p>
               </div>
             </div>
@@ -244,7 +254,7 @@ export default function AppointmentBooking() {
 
             {/* Case Type */}
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-2">Case Type</label>
+              <label className="block text-sm font-medium text-neutral-300 mb-2">Case Type <span className="text-red-400">*</span></label>
               <select
                 value={form.caseType}
                 onChange={(e) => updateForm({ caseType: e.target.value })}
@@ -259,15 +269,32 @@ export default function AppointmentBooking() {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-2">Case Description</label>
+              <label className="block text-sm font-medium text-neutral-300 mb-2">Case Description <span className="text-red-400">*</span></label>
               <textarea
                 value={form.description}
                 onChange={(e) => updateForm({ description: e.target.value })}
-                placeholder="Briefly describe your legal matter..."
+                placeholder="Briefly describe your legal matter…"
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl bg-dark-800/60 border border-white/[0.08] text-sm text-neutral-200 placeholder:text-neutral-600 focus:outline-none focus:border-gold-500/40 transition-colors resize-none"
+                className={`w-full px-4 py-3 rounded-xl bg-dark-800/60 border text-sm text-neutral-200 placeholder:text-neutral-600 focus:outline-none focus:border-gold-500/40 transition-colors resize-none ${
+                  form.description.length > 0 && form.description.trim().length < 3
+                    ? "border-amber-500/40"
+                    : form.description.trim().length >= 3
+                      ? "border-emerald-500/30"
+                      : "border-white/[0.08]"
+                }`}
               />
-              <p className="text-[10px] text-neutral-600 mt-1">{form.description.length}/500 characters • minimum 10</p>
+              <p className={`text-[11px] mt-1.5 ${
+                form.description.trim().length >= 3
+                  ? "text-emerald-400"
+                  : form.description.length > 0
+                    ? "text-amber-400"
+                    : "text-neutral-500"
+              }`}>
+                {form.description.trim().length >= 3
+                  ? `✓ ${form.description.length}/500 characters`
+                  : `${form.description.length}/500 characters — minimum 3 required to continue`
+                }
+              </p>
             </div>
 
             {/* Urgency */}
@@ -446,7 +473,23 @@ export default function AppointmentBooking() {
           NAVIGATION BUTTONS (Steps 0–1)
           ═══════════════════════════════════════════════════════ */}
       {step < 2 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between mt-8 pt-6 border-t border-white/[0.06]">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 pt-6 border-t border-white/[0.06]">
+          {/* Validation Hints */}
+          {!canProceed && step === 0 && (
+            <div className="flex items-start gap-2 mb-4 px-3 py-2.5 rounded-xl bg-amber-500/8 border border-amber-500/15">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-[12px] text-amber-300 space-y-0.5">
+                <p className="font-medium">Please complete the required fields:</p>
+                <ul className="list-disc list-inside text-amber-300/80">
+                  {!form.caseType && <li>Select a case type</li>}
+                  {form.description.trim().length < 10 && (
+                    <li>Enter a case description (at least 3 characters — you have {form.description.trim().length})</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
           <button onClick={handleBack} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-200 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
@@ -457,14 +500,15 @@ export default function AppointmentBooking() {
           >
             {step === 1 ? "Review & Confirm" : "Next"} <ArrowRight className="w-4 h-4" />
           </button>
+          </div>
         </motion.div>
       )}
 
       {/* ═══════════════════════════════════════════════════════
           CONFIRMATION PREVIEW MODAL
           ═══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {showConfirmModal && (
+      {showConfirmModal && createPortal(
+        <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -548,8 +592,9 @@ export default function AppointmentBooking() {
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
