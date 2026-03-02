@@ -25,7 +25,45 @@ import {
 } from "react";
 import { AppointmentStatus, CaseStatus, PaymentStatus } from "@utils/statusEnums";
 import { createDeadline, DEFAULT_TIME_WINDOWS } from "@utils/timeHelpers";
-import { seedAppointments, seedCases, seedPayments } from "@services/mockSeedData";
+import { seedAppointments, seedCases, seedPayments, seedNotifications } from "@services/mockSeedData";
+
+// ── Valid Appointment State Transitions (strict state machine) ──
+
+const VALID_TRANSITIONS = Object.freeze({
+  [AppointmentStatus.PENDING_APPROVAL]: [
+    AppointmentStatus.APPROVED_AWAITING_PAYMENT,
+    AppointmentStatus.DECLINED,
+    AppointmentStatus.EXPIRED,
+    AppointmentStatus.CANCELLED,
+  ],
+  [AppointmentStatus.APPROVED_AWAITING_PAYMENT]: [
+    AppointmentStatus.CONFIRMED,
+    AppointmentStatus.PAYMENT_EXPIRED,
+    AppointmentStatus.CANCELLED,
+  ],
+  [AppointmentStatus.CONFIRMED]: [
+    AppointmentStatus.COMPLETED,
+    AppointmentStatus.CANCELLED,
+  ],
+  // Terminal states — no further transitions allowed
+  [AppointmentStatus.COMPLETED]: [],
+  [AppointmentStatus.CANCELLED]: [],
+  [AppointmentStatus.DECLINED]: [],
+  [AppointmentStatus.EXPIRED]: [],
+  [AppointmentStatus.PAYMENT_EXPIRED]: [],
+});
+
+/**
+ * Validate whether a status transition is legal.
+ * Admin overrides bypass validation.
+ */
+function isValidTransition(currentStatus, nextStatus) {
+  // Allow admin overrides
+  if (!currentStatus) return true;
+  const allowed = VALID_TRANSITIONS[currentStatus];
+  if (!allowed) return true; // Unknown status → allow
+  return allowed.includes(nextStatus);
+}
 
 // ── Action Types ─────────────────────────────────────────────
 
@@ -52,6 +90,8 @@ const ActionTypes = Object.freeze({
   // Notifications
   ADD_NOTIFICATION: "ADD_NOTIFICATION",
   DISMISS_NOTIFICATION: "DISMISS_NOTIFICATION",
+  MARK_NOTIFICATION_READ: "MARK_NOTIFICATION_READ",
+  MARK_ALL_NOTIFICATIONS_READ: "MARK_ALL_NOTIFICATIONS_READ",
   CLEAR_NOTIFICATIONS: "CLEAR_NOTIFICATIONS",
 
   // Config
@@ -87,13 +127,23 @@ function appReducer(state, action) {
         appointments: [action.payload, ...state.appointments],
       };
 
-    case ActionTypes.UPDATE_APPOINTMENT:
+    case ActionTypes.UPDATE_APPOINTMENT: {
+      const { id, status: nextStatus, overriddenBy, ...rest } = action.payload;
       return {
         ...state,
-        appointments: state.appointments.map((a) =>
-          a.id === action.payload.id ? { ...a, ...action.payload } : a
-        ),
+        appointments: state.appointments.map((a) => {
+          if (a.id !== id) return a;
+          // Admin overrides bypass transition validation
+          if (nextStatus && !overriddenBy && !isValidTransition(a.status, nextStatus)) {
+            console.warn(
+              `[AppointmentStore] Invalid transition: ${a.status} → ${nextStatus} for ${id}. Rejected.`
+            );
+            return a;
+          }
+          return { ...a, ...rest, ...(nextStatus ? { status: nextStatus } : {}), ...(overriddenBy ? { overriddenBy, overriddenAt: rest.overriddenAt } : {}) };
+        }),
       };
+    }
 
     case ActionTypes.REMOVE_APPOINTMENT:
       return {
@@ -166,7 +216,7 @@ function appReducer(state, action) {
       return {
         ...state,
         notifications: [
-          { id: `notif-${Date.now()}`, timestamp: Date.now(), ...action.payload },
+          { id: `notif-${Date.now()}`, timestamp: Date.now(), read: false, ...action.payload },
           ...state.notifications,
         ].slice(0, 50), // Keep last 50
       };
@@ -175,6 +225,22 @@ function appReducer(state, action) {
       return {
         ...state,
         notifications: state.notifications.filter((n) => n.id !== action.payload),
+      };
+
+    case ActionTypes.MARK_NOTIFICATION_READ:
+      return {
+        ...state,
+        notifications: state.notifications.map((n) =>
+          n.id === action.payload ? { ...n, read: true } : n
+        ),
+      };
+
+    case ActionTypes.MARK_ALL_NOTIFICATIONS_READ:
+      return {
+        ...state,
+        notifications: state.notifications.map((n) =>
+          action.payload ? (n.targetRole === action.payload ? { ...n, read: true } : n) : { ...n, read: true }
+        ),
       };
 
     case ActionTypes.CLEAR_NOTIFICATIONS:
@@ -205,9 +271,14 @@ export function AppStoreProvider({ children }) {
       const appointments = seedAppointments();
       const cases = seedCases();
       const payments = seedPayments();
+      const notifications = seedNotifications();
       dispatch({ type: ActionTypes.SET_APPOINTMENTS, payload: appointments });
       dispatch({ type: ActionTypes.SET_CASES, payload: cases });
       dispatch({ type: ActionTypes.SET_PAYMENTS, payload: payments });
+      // Dispatch in reverse so the first seed item ends up at the top (newest first)
+      [...notifications].reverse().forEach((n) =>
+        dispatch({ type: ActionTypes.ADD_NOTIFICATION, payload: n })
+      );
     }
   }, [state.initialized]);
 
@@ -234,6 +305,8 @@ export function AppStoreProvider({ children }) {
               title: "Appointment Expired",
               message: `Appointment #${apt.id.slice(-6)} expired — lawyer did not respond in time.`,
               appointmentId: apt.id,
+              targetRole: "client",
+              category: "appointment",
             },
           });
         }
@@ -246,7 +319,7 @@ export function AppStoreProvider({ children }) {
         ) {
           dispatch({
             type: ActionTypes.UPDATE_APPOINTMENT,
-            payload: { id: apt.id, status: AppointmentStatus.EXPIRED },
+            payload: { id: apt.id, status: AppointmentStatus.PAYMENT_EXPIRED },
           });
           dispatch({
             type: ActionTypes.ADD_NOTIFICATION,
@@ -255,6 +328,19 @@ export function AppStoreProvider({ children }) {
               title: "Payment Window Expired",
               message: `Payment deadline passed for appointment #${apt.id.slice(-6)}. Slot released.`,
               appointmentId: apt.id,
+              targetRole: "client",
+              category: "payment",
+            },
+          });
+          dispatch({
+            type: ActionTypes.ADD_NOTIFICATION,
+            payload: {
+              type: "warning",
+              title: "Payment Window Expired",
+              message: `Client did not pay for appointment #${apt.id.slice(-6)}. Slot released.`,
+              appointmentId: apt.id,
+              targetRole: "lawyer",
+              category: "payment",
             },
           });
           // Expire the associated payment
@@ -288,6 +374,19 @@ export function AppStoreProvider({ children }) {
               title: "Case Payment Overdue",
               message: `Payment for case "${c.title}" is now overdue.`,
               caseId: c.id,
+              targetRole: "client",
+              category: "payment",
+            },
+          });
+          dispatch({
+            type: ActionTypes.ADD_NOTIFICATION,
+            payload: {
+              type: "error",
+              title: "Case Payment Overdue",
+              message: `Client payment for case "${c.title}" is now overdue.`,
+              caseId: c.id,
+              targetRole: "lawyer",
+              category: "payment",
             },
           });
         }
@@ -324,6 +423,19 @@ export function AppStoreProvider({ children }) {
           title: "Appointment Booked",
           message: `Your appointment request has been sent to ${appointmentData.lawyerName}. They have ${state.config.lawyerApprovalHours}h to respond.`,
           appointmentId: id,
+          targetRole: "client",
+          category: "appointment",
+        },
+      });
+      dispatch({
+        type: ActionTypes.ADD_NOTIFICATION,
+        payload: {
+          type: "info",
+          title: "New Consultation Request",
+          message: `${appointmentData.clientName || "A client"} has requested a consultation.`,
+          appointmentId: id,
+          targetRole: "lawyer",
+          category: "appointment",
         },
       });
 
@@ -373,8 +485,21 @@ export function AppStoreProvider({ children }) {
         payload: {
           type: "success",
           title: "Appointment Approved",
-          message: `Appointment #${appointmentId.slice(-6)} approved. Client has ${state.config.clientPaymentMinutes} minutes to complete payment.`,
+          message: `Your appointment has been approved. You have ${state.config.clientPaymentMinutes} minutes to complete payment.`,
           appointmentId,
+          targetRole: "client",
+          category: "appointment",
+        },
+      });
+      dispatch({
+        type: ActionTypes.ADD_NOTIFICATION,
+        payload: {
+          type: "success",
+          title: "Appointment Approved",
+          message: `You approved appointment #${appointmentId.slice(-6)}. Awaiting client payment.`,
+          appointmentId,
+          targetRole: "lawyer",
+          category: "appointment",
         },
       });
     },
@@ -397,8 +522,10 @@ export function AppStoreProvider({ children }) {
       payload: {
         type: "warning",
         title: "Appointment Declined",
-        message: `Appointment #${appointmentId.slice(-6)} was declined.${reason ? ` Reason: ${reason}` : ""}`,
+        message: `Your appointment request was declined.${reason ? ` Reason: ${reason}` : ""}`,
         appointmentId,
+        targetRole: "client",
+        category: "appointment",
       },
     });
   }, []);
@@ -443,6 +570,19 @@ export function AppStoreProvider({ children }) {
           title: "Payment Successful",
           message: `Payment of LKR ${payment.amount.toLocaleString()} has been confirmed.`,
           paymentId,
+          targetRole: "client",
+          category: "payment",
+        },
+      });
+      dispatch({
+        type: ActionTypes.ADD_NOTIFICATION,
+        payload: {
+          type: "success",
+          title: "Payment Received",
+          message: `LKR ${payment.amount.toLocaleString()} payment received for ${payment.caseId ? "case" : "consultation"}.`,
+          paymentId,
+          targetRole: "lawyer",
+          category: "payment",
         },
       });
     },
@@ -460,8 +600,21 @@ export function AppStoreProvider({ children }) {
       payload: {
         type: "success",
         title: "Consultation Completed",
-        message: `Appointment #${appointmentId.slice(-6)} marked as completed.`,
+        message: `Your consultation has been completed. A case may be started from this.`,
         appointmentId,
+        targetRole: "client",
+        category: "appointment",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "success",
+        title: "Consultation Completed",
+        message: `Consultation #${appointmentId.slice(-6)} marked as completed.`,
+        appointmentId,
+        targetRole: "lawyer",
+        category: "appointment",
       },
     });
   }, []);
@@ -484,6 +637,19 @@ export function AppStoreProvider({ children }) {
         title: "Appointment Cancelled",
         message: `Appointment #${appointmentId.slice(-6)} has been cancelled.`,
         appointmentId,
+        targetRole: "client",
+        category: "appointment",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "info",
+        title: "Appointment Cancelled",
+        message: `A client has cancelled appointment #${appointmentId.slice(-6)}.`,
+        appointmentId,
+        targetRole: "lawyer",
+        category: "appointment",
       },
     });
   }, []);
@@ -522,8 +688,21 @@ export function AppStoreProvider({ children }) {
         payload: {
           type: "success",
           title: "Case Started",
-          message: `Case "${caseData.title}" has been created from consultation #${appointmentId.slice(-6)}.`,
+          message: `A new case "${caseData.title}" has been started from your consultation.`,
           caseId: id,
+          targetRole: "client",
+          category: "case",
+        },
+      });
+      dispatch({
+        type: ActionTypes.ADD_NOTIFICATION,
+        payload: {
+          type: "success",
+          title: "Case Started",
+          message: `Case "${caseData.title}" created from consultation #${appointmentId.slice(-6)}.`,
+          caseId: id,
+          targetRole: "lawyer",
+          category: "case",
         },
       });
 
@@ -569,18 +748,32 @@ export function AppStoreProvider({ children }) {
       dispatch({
         type: ActionTypes.ADD_NOTIFICATION,
         payload: {
+          type: "warning",
+          title: "Payment Requested",
+          message: `Your lawyer has requested LKR ${amount.toLocaleString()} for case "${c.title}".`,
+          caseId,
+          paymentId,
+          targetRole: "client",
+          category: "payment",
+        },
+      });
+      dispatch({
+        type: ActionTypes.ADD_NOTIFICATION,
+        payload: {
           type: "info",
           title: "Payment Requested",
           message: `LKR ${amount.toLocaleString()} payment requested for case "${c.title}".`,
           caseId,
           paymentId,
+          targetRole: "lawyer",
+          category: "payment",
         },
       });
     },
     [state.cases, state.config.casePaymentDays]
   );
 
-  /** Close a case */
+  /** Close a case (lawyer action) */
   const closeCase = useCallback((caseId) => {
     dispatch({
       type: ActionTypes.UPDATE_CASE,
@@ -591,13 +784,62 @@ export function AppStoreProvider({ children }) {
       payload: {
         type: "success",
         title: "Case Closed",
+        message: `Your case #${caseId.slice(-6)} has been closed by your lawyer.`,
+        caseId,
+        targetRole: "client",
+        category: "case",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "success",
+        title: "Case Closed",
         message: `Case #${caseId.slice(-6)} has been closed.`,
         caseId,
+        targetRole: "lawyer",
+        category: "case",
       },
     });
   }, []);
 
-  /** Terminate a case (overdue / non-payment) */
+  /** End a case (client action) */
+  const endCase = useCallback((caseId, reason = "") => {
+    dispatch({
+      type: ActionTypes.UPDATE_CASE,
+      payload: {
+        id: caseId,
+        status: CaseStatus.ENDED,
+        endedAt: Date.now(),
+        endReason: reason,
+        progress: 100,
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "info",
+        title: "Case Ended",
+        message: `You have ended case #${caseId.slice(-6)}.${reason ? ` Reason: ${reason}` : ""}`,
+        caseId,
+        targetRole: "client",
+        category: "case",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "warning",
+        title: "Case Ended by Client",
+        message: `Client has ended case #${caseId.slice(-6)}.${reason ? ` Reason: ${reason}` : ""}`,
+        caseId,
+        targetRole: "lawyer",
+        category: "case",
+      },
+    });
+  }, []);
+
+  /** Terminate a case (overdue / non-payment — lawyer action) */
   const terminateCase = useCallback((caseId, reason = "") => {
     dispatch({
       type: ActionTypes.UPDATE_CASE,
@@ -613,8 +855,21 @@ export function AppStoreProvider({ children }) {
       payload: {
         type: "error",
         title: "Case Terminated",
+        message: `Your case #${caseId.slice(-6)} has been terminated.${reason ? ` Reason: ${reason}` : ""}`,
+        caseId,
+        targetRole: "client",
+        category: "case",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "error",
+        title: "Case Terminated",
         message: `Case #${caseId.slice(-6)} has been terminated.${reason ? ` Reason: ${reason}` : ""}`,
         caseId,
+        targetRole: "lawyer",
+        category: "case",
       },
     });
   }, []);
@@ -659,10 +914,14 @@ export function AppStoreProvider({ children }) {
 
   /** Add a document to a case */
   const addDocumentToCase = useCallback((caseId, document) => {
+    // Normalize type — ensure it's always a file extension, not a MIME type
+    let docType = document.type || "file";
+    if (docType.includes("/")) docType = docType.split("/").pop().replace("x-", "");
     const doc = {
       id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       uploadedAt: Date.now(),
       ...document,
+      type: docType,
     };
     dispatch({ type: ActionTypes.ADD_DOCUMENT_TO_CASE, payload: { caseId, document: doc } });
     dispatch({
@@ -670,8 +929,21 @@ export function AppStoreProvider({ children }) {
       payload: {
         type: "success",
         title: "Document Uploaded",
-        message: `"${document.name}" added to case.`,
+        message: `"${document.name}" has been uploaded to your case.`,
         caseId,
+        targetRole: "client",
+        category: "case",
+      },
+    });
+    dispatch({
+      type: ActionTypes.ADD_NOTIFICATION,
+      payload: {
+        type: "success",
+        title: "Document Uploaded",
+        message: `A document "${document.name}" was uploaded to the case.`,
+        caseId,
+        targetRole: "lawyer",
+        category: "case",
       },
     });
     return doc;
@@ -729,6 +1001,16 @@ export function AppStoreProvider({ children }) {
     dispatch({ type: ActionTypes.DISMISS_NOTIFICATION, payload: notifId });
   }, []);
 
+  /** Mark a single notification as read */
+  const markNotificationRead = useCallback((notifId) => {
+    dispatch({ type: ActionTypes.MARK_NOTIFICATION_READ, payload: notifId });
+  }, []);
+
+  /** Mark all notifications as read (optionally filtered by role) */
+  const markAllNotificationsRead = useCallback((role = null) => {
+    dispatch({ type: ActionTypes.MARK_ALL_NOTIFICATIONS_READ, payload: role });
+  }, []);
+
   // ── Memoized Value ─────────────────────────────────────────
 
   const value = useMemo(
@@ -752,6 +1034,7 @@ export function AppStoreProvider({ children }) {
       startCase,
       requestCasePayment,
       closeCase,
+      endCase,
       terminateCase,
       addDocumentToCase,
       removeDocumentFromCase,
@@ -764,6 +1047,8 @@ export function AppStoreProvider({ children }) {
 
       // Notification Actions
       dismissNotification,
+      markNotificationRead,
+      markAllNotificationsRead,
     }),
     [
       state,
@@ -776,6 +1061,7 @@ export function AppStoreProvider({ children }) {
       startCase,
       requestCasePayment,
       closeCase,
+      endCase,
       terminateCase,
       addDocumentToCase,
       removeDocumentFromCase,
@@ -784,6 +1070,8 @@ export function AppStoreProvider({ children }) {
       overrideCaseStatus,
       updateConfig,
       dismissNotification,
+      markNotificationRead,
+      markAllNotificationsRead,
     ]
   );
 
