@@ -1,93 +1,131 @@
 /**
  * ══════════════════════════════════════════════════════════════
- * SL-LMS NOTIFICATION BELL
- * Notification icon with badge count and dropdown panel.
+ * SL-LMS NOTIFICATION BELL — Store-Connected
  * ══════════════════════════════════════════════════════════════
+ *
+ * Connected to globalStore. Shows real notifications with:
+ *  • Live unread count badge
+ *  • Mark individual / all as read
+ *  • Dismiss notifications
+ *  • Category-based icons
+ *  • Relative timestamps
+ *  • Role-filtered (via useAuth)
  */
 
-import { useState, useRef, useEffect } from "react";
-import { Bell, Check, Clock, Info, AlertTriangle } from "lucide-react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import {
+  Bell,
+  Check,
+  CheckCheck,
+  Calendar,
+  CreditCard,
+  Briefcase,
+  Info,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  X,
+} from "lucide-react";
+import { useAppStore } from "@/store/globalStore";
+import { useAuth } from "@context/AuthContext";
 
-// ── Mock notifications (replace with real data hook later) ───
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    type: "info",
-    title: "Appointment Confirmed",
-    message: "Your consultation with Atty. Perera is confirmed for tomorrow at 10 AM.",
-    time: "2 min ago",
-    read: false,
-  },
-  {
-    id: 2,
-    type: "success",
-    title: "Document Uploaded",
-    message: "Case #1024 documents have been successfully uploaded.",
-    time: "1 hour ago",
-    read: false,
-  },
-  {
-    id: 3,
-    type: "warning",
-    title: "Payment Due",
-    message: "Invoice #INV-2024-003 is due in 3 days.",
-    time: "3 hours ago",
-    read: true,
-  },
-  {
-    id: 4,
-    type: "info",
-    title: "System Update",
-    message: "New features have been added to the dashboard.",
-    time: "1 day ago",
-    read: true,
-  },
-];
+// ── Icon mappings ────────────────────────────────────────────
 
 const TYPE_ICONS = {
   info: Info,
-  success: Check,
+  success: CheckCircle,
   warning: AlertTriangle,
-  pending: Clock,
+  error: XCircle,
+};
+
+const CATEGORY_ICONS = {
+  appointment: Calendar,
+  payment: CreditCard,
+  case: Briefcase,
+  system: Bell,
 };
 
 const TYPE_COLORS = {
   info: "text-blue-400 bg-blue-500/10",
   success: "text-emerald-400 bg-emerald-500/10",
   warning: "text-amber-400 bg-amber-500/10",
-  pending: "text-neutral-400 bg-neutral-500/10",
+  error: "text-red-400 bg-red-500/10",
 };
+
+// ── Relative time formatter ──────────────────────────────────
+
+function formatRelativeTime(timestamp) {
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(timestamp).toLocaleDateString("en-LK", {
+    month: "short",
+    day: "numeric",
+  });
+}
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
   const panelRef = useRef(null);
+  const { user } = useAuth();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const {
+    notifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    dismissNotification,
+  } = useAppStore();
 
-  // ── Close on outside click ──────────────────────────────────
+  // Filter by role
+  const role = user?.role || "client";
+  const myNotifications = useMemo(
+    () =>
+      notifications.filter(
+        (n) => !n.targetRole || n.targetRole === role || n.targetRole === "all"
+      ),
+    [notifications, role]
+  );
+
+  const unreadCount = useMemo(
+    () => myNotifications.filter((n) => !n.read).length,
+    [myNotifications]
+  );
+
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (panelRef.current && !panelRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+  const handleMarkAllRead = useCallback(() => {
+    markAllNotificationsRead(role);
+  }, [markAllNotificationsRead, role]);
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
+  const handleClick = useCallback(
+    (notif) => {
+      if (!notif.read) markNotificationRead(notif.id);
+    },
+    [markNotificationRead]
+  );
+
+  const handleDismiss = useCallback(
+    (e, notifId) => {
+      e.stopPropagation();
+      dismissNotification(notifId);
+    },
+    [dismissNotification]
+  );
 
   return (
     <div className="relative" ref={panelRef}>
@@ -104,7 +142,6 @@ export default function NotificationBell() {
       >
         <Bell className="w-[18px] h-[18px]" />
 
-        {/* Badge */}
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-gold-500 text-dark-950 text-[10px] font-bold shadow-[0_0_8px_rgba(198,167,94,0.4)] animate-pulse">
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -136,9 +173,10 @@ export default function NotificationBell() {
               </div>
               {unreadCount > 0 && (
                 <button
-                  onClick={markAllRead}
-                  className="text-xs text-gold-500 hover:text-gold-400 transition-colors"
+                  onClick={handleMarkAllRead}
+                  className="flex items-center gap-1 text-xs text-gold-500 hover:text-gold-400 transition-colors"
                 >
+                  <CheckCheck className="w-3 h-3" />
                   Mark all read
                 </button>
               )}
@@ -146,48 +184,61 @@ export default function NotificationBell() {
 
             {/* Notification List */}
             <div className="max-h-80 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {myNotifications.length === 0 ? (
                 <div className="py-12 text-center">
                   <Bell className="w-8 h-8 mx-auto text-neutral-600 mb-3" />
                   <p className="text-sm text-neutral-500">No notifications yet</p>
                 </div>
               ) : (
-                notifications.map((notification) => {
-                  const TypeIcon = TYPE_ICONS[notification.type] || Info;
-                  const typeColor = TYPE_COLORS[notification.type] || TYPE_COLORS.info;
+                myNotifications.slice(0, 20).map((notif) => {
+                  const CategoryIcon = CATEGORY_ICONS[notif.category] || TYPE_ICONS[notif.type] || Info;
+                  const typeColor = TYPE_COLORS[notif.type] || TYPE_COLORS.info;
 
                   return (
                     <button
-                      key={notification.id}
-                      onClick={() => markAsRead(notification.id)}
-                      className={`flex items-start gap-3 w-full px-4 py-3 text-left transition-colors duration-150 hover:bg-white/[0.03] ${
-                        !notification.read ? "bg-gold-500/[0.02]" : ""
+                      key={notif.id}
+                      onClick={() => handleClick(notif)}
+                      className={`group flex items-start gap-3 w-full px-4 py-3 text-left transition-colors duration-150 hover:bg-white/[0.03] ${
+                        !notif.read ? "bg-gold-500/[0.02]" : ""
                       }`}
                     >
                       {/* Icon */}
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5 ${typeColor}`}>
-                        <TypeIcon className="w-4 h-4" />
+                      <div
+                        className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5 ${typeColor}`}
+                      >
+                        <CategoryIcon className="w-4 h-4" />
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className={`text-sm font-medium truncate ${
-                            notification.read ? "text-neutral-400" : "text-neutral-100"
-                          }`}>
-                            {notification.title}
+                          <p
+                            className={`text-sm font-medium truncate ${
+                              notif.read ? "text-neutral-400" : "text-neutral-100"
+                            }`}
+                          >
+                            {notif.title}
                           </p>
-                          {!notification.read && (
+                          {!notif.read && (
                             <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-gold-500" />
                           )}
                         </div>
                         <p className="text-xs text-neutral-500 mt-0.5 line-clamp-2">
-                          {notification.message}
+                          {notif.message}
                         </p>
                         <p className="text-[10px] text-neutral-600 mt-1">
-                          {notification.time}
+                          {formatRelativeTime(notif.timestamp)}
                         </p>
                       </div>
+
+                      {/* Dismiss */}
+                      <button
+                        onClick={(e) => handleDismiss(e, notif.id)}
+                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-white/[0.06] transition-all"
+                        aria-label="Dismiss"
+                      >
+                        <X className="w-3 h-3 text-neutral-600" />
+                      </button>
                     </button>
                   );
                 })
@@ -195,11 +246,14 @@ export default function NotificationBell() {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-white/[0.06] px-4 py-2.5">
-              <button className="w-full text-center text-xs text-gold-500 hover:text-gold-400 font-medium transition-colors">
-                View All Notifications
-              </button>
-            </div>
+            {myNotifications.length > 0 && (
+              <div className="border-t border-white/[0.06] px-4 py-2.5">
+                <p className="text-center text-[11px] text-neutral-600">
+                  {myNotifications.length} notification{myNotifications.length !== 1 ? "s" : ""}
+                  {unreadCount > 0 ? ` · ${unreadCount} unread` : ""}
+                </p>
+              </div>
+            )}
           </div>
         </>
       )}
