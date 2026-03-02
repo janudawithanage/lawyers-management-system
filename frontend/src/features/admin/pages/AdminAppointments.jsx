@@ -80,7 +80,7 @@ export default function AdminAppointments() {
         a.clientName?.toLowerCase().includes(q) ||
         a.lawyerName?.toLowerCase().includes(q) ||
         a.id?.toLowerCase().includes(q) ||
-        a.type?.toLowerCase().includes(q)
+        a.caseType?.toLowerCase().includes(q)
       );
     }
     result.sort((a, b) => {
@@ -176,7 +176,7 @@ export default function AdminAppointments() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
-                    {[{ key: "id", label: "ID" }, { key: "clientName", label: "Client" }, { key: "lawyerName", label: "Lawyer" }, { key: "type", label: "Type" }, { key: "date", label: "Date" }, { key: "status", label: "Status" }].map((col) => (
+                    {[{ key: "id", label: "ID" }, { key: "clientName", label: "Client" }, { key: "lawyerName", label: "Lawyer" }, { key: "caseType", label: "Type" }, { key: "selectedDate", label: "Date" }, { key: "status", label: "Status" }].map((col) => (
                       <th key={col.key} onClick={() => toggleSort(col.key)}
                         className="py-3 px-4 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap cursor-pointer hover:text-neutral-300 transition-colors">
                         <span className="flex items-center gap-1">{col.label}{sortField === col.key && <ArrowUpDown className="w-3 h-3 text-[#C6A75E]" />}</span>
@@ -202,11 +202,11 @@ export default function AdminAppointments() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-300 bg-dark-700/60 border border-white/[0.06]">{apt.type}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-300 bg-dark-700/60 border border-white/[0.06]">{apt.caseType}</span>
                       </td>
                       <td className="py-3 px-4 text-xs text-neutral-400">
-                        {apt.date ? new Date(apt.date).toLocaleDateString("en-LK", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                        {apt.time && <span className="text-neutral-600 ml-1">• {apt.time}</span>}
+                        {apt.selectedDate ? apt.selectedDate : "—"}
+                        {apt.selectedTime && <span className="text-neutral-600 ml-1">• {apt.selectedTime}</span>}
                       </td>
                       <td className="py-3 px-4"><StatusBadge status={apt.status} /></td>
                     </motion.tr>
@@ -230,8 +230,8 @@ export default function AdminAppointments() {
                 </div>
                 <div className="flex items-center gap-3 text-[11px] text-neutral-600">
                   <span className="font-mono">{apt.id}</span>
-                  <span>{apt.type}</span>
-                  <span>{apt.date ? new Date(apt.date).toLocaleDateString("en-LK", { month: "short", day: "numeric" }) : "—"}</span>
+                  <span>{apt.caseType}</span>
+                  <span>{apt.selectedDate || "—"}</span>
                 </div>
               </motion.div>
             ))}

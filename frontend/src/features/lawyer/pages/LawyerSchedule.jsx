@@ -22,8 +22,8 @@ import {
   Users,
 } from "lucide-react";
 import { useAppStore } from "@/store/globalStore";
-
-const MOCK_LAWYER_ID = "LWR-003";
+import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
+import { AppointmentStatus } from "@utils/statusEnums";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -44,10 +44,15 @@ export default function LawyerSchedule() {
   const [saved, setSaved] = useState(false);
 
   const upcomingAppointments = useMemo(() => {
-    const now = new Date();
+    const today = new Date().toISOString().split("T")[0];
     return appointments
-      .filter((a) => a.lawyerId === MOCK_LAWYER_ID && ["confirmed", "pending"].includes(a.status) && new Date(a.date) >= now)
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .filter(
+        (a) =>
+          a.lawyerId === MOCK_LAWYER_ID &&
+          [AppointmentStatus.CONFIRMED, AppointmentStatus.PENDING_APPROVAL].includes(a.status) &&
+          a.selectedDate >= today
+      )
+      .sort((a, b) => (a.selectedDate || "").localeCompare(b.selectedDate || ""))
       .slice(0, 5);
   }, [appointments]);
 
@@ -169,7 +174,7 @@ export default function LawyerSchedule() {
                 <div key={appt.id} className="p-3 rounded-xl bg-dark-800/40 border border-white/[0.06]">
                   <p className="text-sm font-medium text-neutral-200 truncate">{appt.clientName || "Client"}</p>
                   <p className="text-[11px] text-neutral-500 mt-0.5">
-                    {new Date(appt.date).toLocaleDateString("en-LK", { month: "short", day: "numeric" })} • {appt.time} • <span className={`capitalize ${appt.status === "confirmed" ? "text-emerald-400" : "text-amber-400"}`}>{appt.status}</span>
+                    {appt.selectedDate} • {appt.selectedTime} • <span className={`capitalize ${appt.status === AppointmentStatus.CONFIRMED ? "text-emerald-400" : "text-amber-400"}`}>{appt.status === AppointmentStatus.CONFIRMED ? "Confirmed" : "Pending"}</span>
                   </p>
                 </div>
               ))
