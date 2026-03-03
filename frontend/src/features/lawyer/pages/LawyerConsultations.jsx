@@ -28,6 +28,7 @@ const MODE_LABELS = { video: "Video Call", "in-office": "In-Office Visit", phone
 const TABS = [
   { id: "upcoming", label: "Upcoming", status: AppointmentStatus.CONFIRMED },
   { id: "completed", label: "Completed", status: AppointmentStatus.COMPLETED },
+  { id: "all", label: "All", status: null },
 ];
 
 export default function LawyerConsultations() {
@@ -48,12 +49,20 @@ export default function LawyerConsultations() {
       .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
   }, [appointments]);
 
+  const all = useMemo(() => {
+    return appointments
+      .filter((a) => a.lawyerId === MOCK_LAWYER_ID && (
+        a.status === AppointmentStatus.CONFIRMED || a.status === AppointmentStatus.COMPLETED
+      ))
+      .sort((a, b) => new Date(b.selectedDate) - new Date(a.selectedDate));
+  }, [appointments]);
+
   // ── Check which completed appointments already have cases ──
   const caseAppointmentIds = useMemo(() => {
     return new Set(cases.filter((c) => c.appointmentId).map((c) => c.appointmentId));
   }, [cases]);
 
-  const list = activeTab === "upcoming" ? upcoming : completed;
+  const list = activeTab === "upcoming" ? upcoming : activeTab === "completed" ? completed : all;
 
   const handleComplete = (id) => completeConsultation(id);
 
@@ -74,7 +83,14 @@ export default function LawyerConsultations() {
       </div>
 
       {/* ── Stats Row ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <StatTile
+          label="All"
+          value={all.length}
+          icon={FileText}
+          color="text-neutral-300"
+          bg="bg-neutral-500/10"
+        />
         <StatTile
           label="Upcoming"
           value={upcoming.length}
@@ -101,7 +117,7 @@ export default function LawyerConsultations() {
       {/* ── Tabs ── */}
       <div className="flex gap-1">
         {TABS.map((tab) => {
-          const count = tab.id === "upcoming" ? upcoming.length : completed.length;
+          const count = tab.id === "upcoming" ? upcoming.length : tab.id === "completed" ? completed.length : all.length;
           return (
             <button
               key={tab.id}
@@ -137,7 +153,7 @@ export default function LawyerConsultations() {
               <CalendarDays className="w-7 h-7 text-neutral-600" />
             </div>
             <p className="text-neutral-400 font-medium">
-              {activeTab === "upcoming" ? "No upcoming consultations" : "No completed consultations yet"}
+              {activeTab === "upcoming" ? "No upcoming consultations" : activeTab === "completed" ? "No completed consultations yet" : "No consultations found"}
             </p>
           </motion.div>
         ) : (
@@ -164,6 +180,8 @@ export default function LawyerConsultations() {
 
 function ConsultationCard({ apt, index, isUpcoming, hasCase, onComplete, onStartCase }) {
   const ModeIcon = MODE_ICONS[apt.consultationType] || Phone;
+  const isConfirmed = apt.status === AppointmentStatus.CONFIRMED;
+  const isCompleted = apt.status === AppointmentStatus.COMPLETED;
 
   return (
     <motion.div
@@ -209,7 +227,7 @@ function ConsultationCard({ apt, index, isUpcoming, hasCase, onComplete, onStart
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {isUpcoming && (
+          {(isUpcoming || isConfirmed) && (
             <button
               onClick={() => onComplete(apt.id)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
@@ -218,7 +236,7 @@ function ConsultationCard({ apt, index, isUpcoming, hasCase, onComplete, onStart
               Mark Complete
             </button>
           )}
-          {!isUpcoming && !hasCase && (
+          {isCompleted && !hasCase && (
             <button
               onClick={() => onStartCase(apt.id)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-[#C6A75E] to-[#B8963E] text-dark-950 hover:shadow-lg hover:shadow-[#C6A75E]/20 transition-all"
@@ -227,7 +245,7 @@ function ConsultationCard({ apt, index, isUpcoming, hasCase, onComplete, onStart
               Start Case
             </button>
           )}
-          {!isUpcoming && hasCase && (
+          {isCompleted && hasCase && (
             <span className="flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <Briefcase className="w-3 h-3" />
               Case Created
