@@ -312,7 +312,7 @@ function AppointmentCard({ apt, index, expanded, onToggle, onApprove, onDecline,
           </div>
         </div>
 
-        {/* Status + Timer */}
+        {/* Quick Actions + Status + Timer */}
         <div className="flex items-center gap-3 flex-shrink-0">
           {isPending && apt.approvalDeadline && (
             <CountdownTimer
@@ -328,6 +328,29 @@ function AppointmentCard({ apt, index, expanded, onToggle, onApprove, onDecline,
               <span className="text-xs font-medium">Awaiting Payment</span>
             </div>
           )}
+
+          {/* Quick Approve / Decline Buttons */}
+          {isPending && (
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); onApprove(apt.id); }}
+                title="Approve"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C6A75E] to-[#B8963E] text-dark-950 hover:shadow-lg hover:shadow-[#C6A75E]/20 transition-all"
+              >
+                <CheckCircle className="w-3.5 h-3.5" />
+                Approve
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDecline(apt.id); }}
+                title="Decline"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/25 transition-all"
+              >
+                <XCircle className="w-3.5 h-3.5" />
+                Decline
+              </button>
+            </div>
+          )}
+
           <StatusBadge status={apt.status} type="appointment" size="sm" />
           {expanded ? (
             <ChevronUp className="w-4 h-4 text-neutral-500" />
