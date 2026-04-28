@@ -154,6 +154,7 @@ export default function SearchPreview() {
           badge="Find Your Lawyer"
           title="Search Verified Lawyers Across Sri Lanka"
           subtitle="Filter by specialization, district, and language to find the perfect legal expert for your needs."
+          maxWidth="max-w-5xl"
         />
 
         {/* Search Bar */}

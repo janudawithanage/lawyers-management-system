@@ -6,6 +6,7 @@ export default function SectionHeading({
   title,
   subtitle,
   align = "center",
+  maxWidth = "max-w-3xl",
 }) {
   const alignClass = align === "center" ? "text-center mx-auto" : "text-left";
 
@@ -15,7 +16,7 @@ export default function SectionHeading({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6 }}
-      className={`max-w-3xl mb-16 ${alignClass}`}
+      className={`${maxWidth} mb-16 ${alignClass}`}
     >
       {badge && (
         <Badge variant="gold" size="lg" className="mb-4">
