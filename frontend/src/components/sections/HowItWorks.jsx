@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { CLIENT_STEPS, LAWYER_STEPS, ADMIN_STEPS } from "../../constants";
 import { Container, SectionHeading } from "../ui";
+import { ScrollReveal } from "../common";
 
 const ROLES = [
   {
@@ -77,38 +78,59 @@ export default function HowItWorks() {
   const colors = colorMap[role.color];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 bg-dark-950" aria-label="How it works">
-      <Container>
-        <SectionHeading
-          badge="How It Works"
-          title="Simple Steps, Powerful Results"
-          subtitle="Whether you're a client seeking legal help, a lawyer growing your practice, or an admin managing the platform — SL-LMS makes it effortless."
+    <section id="how-it-works" className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden" aria-label="How it works">
+      {/* Animated background */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <motion.div
+          className="absolute bottom-0 left-1/3 w-[600px] h-[400px] rounded-full"
+          animate={{
+            x: [0, 30, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background: "radial-gradient(ellipse, rgba(198,167,94,0.03), transparent 70%)",
+            filter: "blur(80px)",
+          }}
         />
+      </div>
+
+      <Container className="relative z-10">
+        <ScrollReveal variant="fadeUp">
+          <SectionHeading
+            badge="How It Works"
+            title="Simple Steps, Powerful Results"
+            subtitle="Whether you're a client seeking legal help, a lawyer growing your practice, or an admin managing the platform — SL-LMS makes it effortless."
+            maxWidth="max-w-6xl"
+          />
+        </ScrollReveal>
 
         {/* Role Tabs */}
-        <div className="flex justify-center mb-16">
-          <div className="inline-flex bg-dark-800 rounded-2xl p-1.5 gap-1 border border-white/5">
-            {ROLES.map((r) => {
-              const Icon = r.icon;
-              const isActive = activeRole === r.key;
-              return (
-                <button
-                  key={r.key}
-                  onClick={() => setActiveRole(r.key)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
-                    isActive
-                      ? colorMap[r.color].tab
-                      : "text-neutral-400 hover:text-neutral-200 hover:bg-white/4"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{r.label}</span>
-                </button>
-              );
-            })}
+        <ScrollReveal variant="scaleUp" delay={0.1}>
+          <div className="flex justify-center mb-16">
+            <div className="inline-flex bg-dark-800 rounded-2xl p-1.5 gap-1 border border-white/5">
+              {ROLES.map((r) => {
+                const Icon = r.icon;
+                const isActive = activeRole === r.key;
+                return (
+                  <button
+                    key={r.key}
+                    onClick={() => setActiveRole(r.key)}
+                    className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? colorMap[r.color].tab
+                        : "text-neutral-400 hover:text-neutral-200 hover:bg-white/4"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{r.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Steps */}
         <AnimatePresence mode="wait">
@@ -133,8 +155,7 @@ export default function HowItWorks() {
                   {/* Connector */}
                   {idx < role.steps.length - 1 && (
                     <div
-                      className={`hidden lg:block absolute top-12 left-[calc(100%+0.75rem)] w-[calc(100%-1.5rem)] h-px ${colors.line}`}
-                      style={{ transform: "translateX(-50%)" }}
+                      className={`hidden lg:block absolute top-12 left-full w-3 h-px ${colors.line}`}
                       aria-hidden="true"
                     />
                   )}
@@ -144,9 +165,14 @@ export default function HowItWorks() {
                       Step {step.step}
                     </span>
 
-                    <div className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center mt-3 mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <motion.div
+                      className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center mt-3 mb-4 group-hover:scale-110 transition-transform duration-300`}
+                      whileHover={{ rotateY: 15, scale: 1.15 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      style={{ transformStyle: "preserve-3d" }}
+                    >
                       <StepIcon className={`w-6 h-6 ${colors.iconText}`} />
-                    </div>
+                    </motion.div>
 
                     <h3 className="text-lg font-semibold text-neutral-100 mb-2">{step.title}</h3>
                     <p className="text-sm text-neutral-500 leading-relaxed">{step.description}</p>
