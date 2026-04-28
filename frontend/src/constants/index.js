@@ -1,8 +1,8 @@
 // ─── Navigation Links ───
 export const NAV_LINKS = [
   { label: "Home", href: "#home" },
-  { label: "How It Works", href: "#how-it-works" },
   { label: "Lawyers", href: "#search" },
+  { label: "How It Works", href: "#how-it-works" },
   { label: "About", href: "#why-choose" },
   { label: "Contact", href: "#contact" },
 ];
