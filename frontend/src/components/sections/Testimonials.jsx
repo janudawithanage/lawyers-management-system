@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useId } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { TESTIMONIALS } from "../../constants";
 import { Container, SectionHeading, Card } from "../ui";
@@ -6,16 +7,20 @@ import { ScrollReveal, TiltCard } from "../common";
 import { getInitials } from "../../utils/formatters";
 
 export default function Testimonials() {
+  const reduceMotion = useReducedMotion();
+  const headingId = useId();
+
   return (
-    <section className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden" aria-label="Testimonials">
+    <section
+      id="testimonials"
+      className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden"
+      aria-labelledby={headingId}
+    >
       {/* Floating background accents */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full"
-          animate={{
-            scale: [1, 1.08, 1],
-            rotate: [0, 3, 0],
-          }}
+          animate={reduceMotion ? undefined : { scale: [1, 1.08, 1], rotate: [0, 3, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           style={{
             background: "radial-gradient(ellipse, rgba(198,167,94,0.03), transparent 70%)",
@@ -27,10 +32,11 @@ export default function Testimonials() {
       <Container className="relative z-10">
         <ScrollReveal variant="fadeUp">
           <SectionHeading
+            id={headingId}
             badge="Testimonials"
             title="Trusted by Clients Across Sri Lanka"
             subtitle="Real experiences from people who found the right legal help through SL-LMS."
-            maxWidth="max-w-6xl"
+            maxWidth="max-w-3xl"
           />
         </ScrollReveal>
 
@@ -51,38 +57,40 @@ export default function Testimonials() {
                   padding="lg"
                   className="relative h-full"
                 >
-                  {/* Quote icon with subtle animation */}
-                  <motion.div
-                    className="absolute top-6 right-6"
-                    aria-hidden="true"
-                    animate={{ rotate: [0, -5, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: idx * 0.5 }}
-                  >
-                    <Quote className="w-8 h-8 text-white/4" />
-                  </motion.div>
+                  {/* Decorative quote mark. Previously an infinite rotation
+                      loop per card — three perpetual animations driving a
+                      glyph at 4% opacity, i.e. invisible movement at a real
+                      cost. Static, and now actually visible. */}
+                  <div className="absolute top-6 right-6" aria-hidden="true">
+                    <Quote className="w-8 h-8 text-gold-500/15" />
+                  </div>
 
                   {/* Stars with stagger animation */}
-                  <div className="flex gap-1 mb-4">
+                  <div className="flex gap-1 mb-4" role="img" aria-label={`${testimonial.rating} out of 5 stars`}>
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, scale: 0 }}
+                        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.3 + idx * 0.1 + i * 0.05, type: "spring" }}
+                        transition={
+                          reduceMotion
+                            ? { duration: 0.2 }
+                            : { delay: 0.3 + idx * 0.1 + i * 0.05, type: "spring" }
+                        }
                       >
-                        <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
+                        <Star className="w-4 h-4 text-gold-400 fill-gold-400" aria-hidden="true" />
                       </motion.div>
                     ))}
                   </div>
 
                   {/* Content */}
-                  <blockquote className="text-neutral-300 text-sm leading-relaxed mb-6">
+                  <blockquote className="text-neutral-200 text-sm leading-relaxed mb-6">
                     &ldquo;{testimonial.content}&rdquo;
                   </blockquote>
 
                   {/* Author */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/6">
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                     <div className="w-10 h-10 rounded-full gradient-gold-btn flex items-center justify-center text-dark-950 font-semibold text-xs shrink-0">
                       {getInitials(testimonial.name)}
                     </div>
@@ -90,7 +98,7 @@ export default function Testimonials() {
                       <div className="text-sm font-semibold text-neutral-100">
                         {testimonial.name}
                       </div>
-                      <div className="text-xs text-neutral-500">
+                      <div className="text-xs text-neutral-400">
                         {testimonial.role}
                       </div>
                     </div>

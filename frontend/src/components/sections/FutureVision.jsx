@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useId, useRef } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Smartphone, Video, Brain, CreditCard } from "lucide-react";
 import { FUTURE_VISION } from "../../constants";
 import { Container, SectionHeading, Card, Badge, IconBox } from "../ui";
@@ -14,20 +14,22 @@ const iconMap = { Smartphone, Video, Brain, CreditCard };
  */
 export default function FutureVision() {
   const sectionRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const headingId = useId();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
   // Parallax for background elements
-  const bgX = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const bgX = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [100, -100]);
   const lineScale = useTransform(scrollYProgress, [0.1, 0.5], [0, 1]);
 
   return (
     <section
       ref={sectionRef}
       className="py-20 lg:py-28 bg-dark-900 relative overflow-hidden"
-      aria-label="Future vision"
+      aria-labelledby={headingId}
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -42,10 +44,7 @@ export default function FutureVision() {
         />
         <motion.div
           className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full"
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.02, 0.05, 0.02],
-          }}
+          animate={reduceMotion ? undefined : { scale: [1, 1.15, 1], opacity: [0.02, 0.05, 0.02] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           style={{
             background: "radial-gradient(circle, rgba(52,211,153,0.06), transparent 70%)",
@@ -57,10 +56,11 @@ export default function FutureVision() {
       <Container className="relative z-10">
         <ScrollReveal variant="fadeUp">
           <SectionHeading
+            id={headingId}
             badge="Roadmap"
             title="The Future of Legal Tech in Sri Lanka"
             subtitle="We're constantly innovating to bring world-class legal technology solutions to Sri Lanka."
-            maxWidth="max-w-6xl"
+            maxWidth="max-w-3xl"
           />
         </ScrollReveal>
 
@@ -115,7 +115,7 @@ export default function FutureVision() {
                       </Badge>
 
                       <motion.div
-                        whileHover={{ rotateY: 10, scale: 1.05 }}
+                        whileHover={reduceMotion ? undefined : { rotateY: 10, scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 300 }}
                         style={{ transformStyle: "preserve-3d" }}
                       >
@@ -125,7 +125,7 @@ export default function FutureVision() {
                       <h3 className="text-lg font-semibold text-neutral-100 mb-2">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-neutral-500 leading-relaxed">
+                      <p className="text-sm text-neutral-400 leading-relaxed">
                         {item.description}
                       </p>
                     </Card>

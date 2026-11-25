@@ -1,10 +1,33 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+  useReducedMotion,
+} from "framer-motion";
+import { usePointerFine } from "../../hooks";
 
 /**
- * TiltCard — Interactive 3D perspective tilt effect on hover.
- * Cards respond to mouse position with a smooth 3D rotation,
- * creating a premium "floating" feel.
+ * TiltCard — Interactive 3D perspective tilt on pointer hover.
+ *
+ * Implementation notes (these matter for how the page feels):
+ *
+ *  • Pointer position is held in motion values, not React state. The previous
+ *    version called setState on every mousemove, re-rendering the card and
+ *    everything inside it ~60×/second; with six feature cards on screen that
+ *    dominated the main thread. Motion values write straight to the compositor
+ *    and never re-render.
+ *
+ *  • The effect is disabled when the primary pointer is coarse (touch). Tilt
+ *    needs hover to read as tilt — on a phone it only fires mid-tap, which
+ *    reads as the card flinching away from the finger.
+ *
+ *  • It is disabled under `prefers-reduced-motion`. Tilt is exactly the kind of
+ *    unsolicited 3D movement that setting exists to suppress.
+ *
+ * In every disabled case the children render untouched, so layout is identical.
  */
 export default function TiltCard({
   children,
@@ -15,67 +38,71 @@ export default function TiltCard({
   ...props
 }) {
   const cardRef = useRef(null);
-  const [transform, setTransform] = useState({
-    rotateX: 0,
-    rotateY: 0,
-    glareX: 50,
-    glareY: 50,
-  });
+  const reduceMotion = useReducedMotion();
+  const pointerFine = usePointerFine();
+  const enabled = pointerFine && !reduceMotion;
 
-  const handleMouseMove = (e) => {
+  // Normalised pointer position, -0.5 … 0.5 from the card centre.
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const hovered = useMotionValue(0);
+
+  const spring = { stiffness: 300, damping: 20, mass: 0.5 };
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [maxTilt, -maxTilt]), spring);
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-maxTilt, maxTilt]), spring);
+  const cardScale = useSpring(useTransform(hovered, [0, 1], [1, scale]), spring);
+
+  // Glare follows the pointer across the card face.
+  const glareX = useTransform(px, [-0.5, 0.5], ["0%", "100%"]);
+  const glareY = useTransform(py, [-0.5, 0.5], ["0%", "100%"]);
+  const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, ${glareColor} 0%, transparent 60%)`;
+
+  const handlePointerMove = (e) => {
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateX = ((y - centerY) / centerY) * -maxTilt;
-    const rotateY = ((x - centerX) / centerX) * maxTilt;
-
-    setTransform({
-      rotateX,
-      rotateY,
-      glareX: (x / rect.width) * 100,
-      glareY: (y / rect.height) * 100,
-    });
+    px.set((e.clientX - rect.left) / rect.width - 0.5);
+    py.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
-  const handleMouseLeave = () => {
-    setTransform({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
+  const handlePointerEnter = () => hovered.set(1);
+
+  const handlePointerLeave = () => {
+    hovered.set(0);
+    px.set(0);
+    py.set(0);
   };
+
+  if (!enabled) {
+    return (
+      <div ref={cardRef} className={`relative ${className}`} {...props}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <motion.div
       ref={cardRef}
       className={`relative ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      animate={{
-        rotateX: transform.rotateX,
-        rotateY: transform.rotateY,
-        scale: transform.rotateX !== 0 || transform.rotateY !== 0 ? scale : 1,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      }}
+      onPointerMove={handlePointerMove}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       style={{
+        rotateX,
+        rotateY,
+        scale: cardScale,
         transformStyle: "preserve-3d",
         perspective: 800,
       }}
       {...props}
     >
       {children}
-      {/* Glare overlay */}
-      <div
-        className="absolute inset-0 rounded-[inherit] pointer-events-none transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(circle at ${transform.glareX}% ${transform.glareY}%, ${glareColor} 0%, transparent 60%)`,
-          opacity: transform.rotateX !== 0 || transform.rotateY !== 0 ? 1 : 0,
-        }}
+      {/* Glare overlay — opacity is driven by the same hover motion value, so
+          it fades with the tilt instead of popping. */}
+      <motion.div
+        className="absolute inset-0 rounded-[inherit] pointer-events-none"
+        style={{ background: glare, opacity: hovered }}
         aria-hidden="true"
       />
     </motion.div>

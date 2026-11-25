@@ -35,7 +35,10 @@ const Button = forwardRef(
     ref
   ) => {
     const baseClasses =
-      "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:ring-offset-2 focus:ring-offset-dark-950 disabled:opacity-50 disabled:cursor-not-allowed";
+      // focus-visible, not focus: a plain `focus:` ring also fires on mouse
+      // click, which trains people to read the ring as "stuck" rather than
+      // as a keyboard position indicator.
+      "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 disabled:opacity-50 disabled:cursor-not-allowed";
 
     const classes = cn(
       baseClasses,

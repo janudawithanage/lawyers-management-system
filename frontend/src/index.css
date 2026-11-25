@@ -30,7 +30,10 @@
      Level 5 : #313136 — Hover states
    
    Accessibility:
-     All text/bg combinations meet WCAG AA (4.5:1+)
+     Text on dark surfaces meets WCAG AA (4.5:1+) with ONE exception:
+       neutral-500 (#737373) measures 4.15:1 on the base and 3.95:1 on
+       #121214 — it does NOT pass AA for body text. Use neutral-400
+       (#a3a3a3, 7.8:1) for descriptions and secondary copy.
      Gold accent on dark surfaces: 5.8:1 – 10.4:1
    ══════════════════════════════════════════════════════════════ */
 
@@ -360,4 +363,56 @@
       color: black;
     }
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UX HARDENING LAYER
+   Fixes for anchor offset, reading measure, motion preference,
+   and keyboard focus affordances on composite cards.
+   ══════════════════════════════════════════════════════════════ */
+
+@layer base {
+  html {
+    /* The header is fixed (~72–88px tall). Without this, every in-page
+       anchor (#search, #features, …) lands with its heading tucked
+       underneath the navbar. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  /* CSS smooth scrolling ignores prefers-reduced-motion on its own. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Headings keep clear of the navbar when deep-linked directly. */
+  :target {
+    scroll-margin-top: 6.5rem;
+  }
+}
+
+/* ─── Reading measure ───
+   Centred paragraphs wider than ~75 characters are measurably harder to
+   read: the eye loses the line it is returning to. These cap the measure
+   independently of the container width. */
+@utility measure {
+  max-width: 68ch;
+}
+
+@utility measure-tight {
+  max-width: 54ch;
+}
+
+/* ─── Keyboard focus for composite cards ───
+   Cards that act as a single target need a visible ring that follows the
+   card radius, not the browser default rectangle. */
+@utility focus-card {
+  outline: none;
+}
+
+@utility ring-focus-card {
+  box-shadow:
+    0 0 0 2px rgba(198, 167, 94, 0.55),
+    0 0 0 5px rgba(198, 167, 94, 0.14);
 }

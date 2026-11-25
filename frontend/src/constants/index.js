@@ -109,6 +109,48 @@ export const MOCK_LAWYERS = [
     verified: true,
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=600&auto=format&fit=crop&crop=face&q=80",
   },
+  // Entries below deliberately carry no photo so the initials fallback is
+  // exercised — it also mirrors a real directory, where plenty of listings
+  // have no uploaded portrait.
+  {
+    id: 4,
+    name: "Nimali Jayawardena",
+    title: "Attorney-at-Law",
+    specialization: "Property Law",
+    district: "Kandy",
+    languages: ["Sinhala", "English"],
+    rating: 4.8,
+    reviews: 71,
+    experience: "9 years",
+    verified: true,
+    avatar: null,
+  },
+  {
+    id: 5,
+    name: "Thevan Rajendran",
+    title: "Attorney-at-Law",
+    specialization: "Labour Law",
+    district: "Batticaloa",
+    languages: ["Tamil", "English"],
+    rating: 4.6,
+    reviews: 58,
+    experience: "7 years",
+    verified: true,
+    avatar: null,
+  },
+  {
+    id: 6,
+    name: "Sanduni Wickramasinghe",
+    title: "Attorney-at-Law",
+    specialization: "Family Law",
+    district: "Galle",
+    languages: ["Sinhala", "Tamil", "English"],
+    rating: 4.9,
+    reviews: 112,
+    experience: "11 years",
+    verified: true,
+    avatar: null,
+  },
 ];
 
 // ─── How It Works Steps ───

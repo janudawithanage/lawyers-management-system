@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useId, useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Search,
   CalendarCheck,
@@ -76,9 +76,40 @@ export default function HowItWorks() {
   const [activeRole, setActiveRole] = useState("client");
   const role = ROLES.find((r) => r.key === activeRole);
   const colors = colorMap[role.color];
+  const reduceMotion = useReducedMotion();
+  const baseId = useId();
+  const headingId = `${baseId}-heading`;
+  const tabId = (key) => `${baseId}-tab-${key}`;
+  const panelId = (key) => `${baseId}-panel-${key}`;
+
+  /**
+   * Arrow-key navigation between tabs.
+   *
+   * A tablist is expected to behave as one tab stop, with Left/Right moving
+   * between the tabs. Without this, each tab is its own stop and arrow keys
+   * do nothing — technically operable, but not what the role announces, which
+   * is the more confusing failure.
+   */
+  const onTabKeyDown = (e) => {
+    const idx = ROLES.findIndex((r) => r.key === activeRole);
+    let next = null;
+    if (e.key === "ArrowRight") next = (idx + 1) % ROLES.length;
+    else if (e.key === "ArrowLeft") next = (idx - 1 + ROLES.length) % ROLES.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = ROLES.length - 1;
+    if (next === null) return;
+    e.preventDefault();
+    const key = ROLES[next].key;
+    setActiveRole(key);
+    document.getElementById(tabId(key))?.focus();
+  };
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden" aria-label="How it works">
+    <section
+      id="how-it-works"
+      className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden"
+      aria-labelledby={headingId}
+    >
       {/* Animated background */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <motion.div
@@ -98,33 +129,50 @@ export default function HowItWorks() {
       <Container className="relative z-10">
         <ScrollReveal variant="fadeUp">
           <SectionHeading
+            id={headingId}
             badge="How It Works"
             title="Simple Steps, Powerful Results"
             subtitle="Whether you're a client seeking legal help, a lawyer growing your practice, or an admin managing the platform — SL-LMS makes it effortless."
-            maxWidth="max-w-6xl"
+            maxWidth="max-w-3xl"
           />
         </ScrollReveal>
 
         {/* Role Tabs */}
         <ScrollReveal variant="scaleUp" delay={0.1}>
-          <div className="flex justify-center mb-16">
-            <div className="inline-flex bg-dark-800 rounded-2xl p-1.5 gap-1 border border-white/5">
+          <div className="flex justify-center mb-12 lg:mb-16">
+            <div
+              role="tablist"
+              aria-label="Choose a role to see its steps"
+              onKeyDown={onTabKeyDown}
+              className="inline-flex bg-dark-800 rounded-2xl p-1.5 gap-1 border border-white/8"
+            >
               {ROLES.map((r) => {
                 const Icon = r.icon;
                 const isActive = activeRole === r.key;
                 return (
                   <button
                     key={r.key}
+                    id={tabId(r.key)}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={panelId(r.key)}
+                    /* Only the selected tab is in the tab order; arrows move
+                       within the list. This is the standard tablist pattern. */
+                    tabIndex={isActive ? 0 : -1}
                     onClick={() => setActiveRole(r.key)}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                    className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70 ${
                       isActive
                         ? colorMap[r.color].tab
-                        : "text-neutral-400 hover:text-neutral-200 hover:bg-white/4"
+                        : "text-neutral-300 hover:text-neutral-100 hover:bg-white/6"
                     }`}
-                    aria-pressed={isActive}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    {/* The label is hidden below sm, which previously left
+                        three unnamed icon buttons. sr-only keeps the
+                        accessible name at every breakpoint. */}
                     <span className="hidden sm:inline">{r.label}</span>
+                    <span className="sm:hidden sr-only">{r.label}</span>
                   </button>
                 );
               })}
@@ -136,20 +184,24 @@ export default function HowItWorks() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeRole}
-            initial={{ opacity: 0, y: 20 }}
+            id={panelId(activeRole)}
+            role="tabpanel"
+            aria-labelledby={tabId(activeRole)}
+            tabIndex={0}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: reduceMotion ? 0.15 : 0.3 }}
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto outline-none"
           >
             {role.steps.map((step, idx) => {
               const StepIcon = role.stepIcons[idx];
               return (
                 <motion.div
                   key={step.step}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
+                  transition={{ delay: reduceMotion ? 0 : idx * 0.1 }}
                   className="relative group"
                 >
                   {/* Connector */}
@@ -167,7 +219,7 @@ export default function HowItWorks() {
 
                     <motion.div
                       className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center mt-3 mb-4 group-hover:scale-110 transition-transform duration-300`}
-                      whileHover={{ rotateY: 15, scale: 1.15 }}
+                      whileHover={reduceMotion ? undefined : { rotateY: 15, scale: 1.15 }}
                       transition={{ type: "spring", stiffness: 300 }}
                       style={{ transformStyle: "preserve-3d" }}
                     >
@@ -175,7 +227,7 @@ export default function HowItWorks() {
                     </motion.div>
 
                     <h3 className="text-lg font-semibold text-neutral-100 mb-2">{step.title}</h3>
-                    <p className="text-sm text-neutral-500 leading-relaxed">{step.description}</p>
+                    <p className="text-sm text-neutral-400 leading-relaxed">{step.description}</p>
                   </div>
                 </motion.div>
               );

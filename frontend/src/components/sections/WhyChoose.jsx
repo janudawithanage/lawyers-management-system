@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useId, useRef } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { MapPin, Lock, Scale, Eye } from "lucide-react";
 import { WHY_CHOOSE } from "../../constants";
 import { Container, SectionHeading, Card, IconBox } from "../ui";
@@ -10,22 +10,28 @@ const iconMap = { MapPin, Lock, Scale, Eye };
 
 export default function WhyChoose() {
   const sectionRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const headingId = useId();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
   // Parallax for background orbs
-  const orbY1 = useTransform(scrollYProgress, [0, 1], [-50, 50]);
-  const orbY2 = useTransform(scrollYProgress, [0, 1], [30, -60]);
-  const imgScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.05]);
+  const orbY1 = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [-50, 50]);
+  const orbY2 = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [30, -60]);
+  const imgScale = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    reduceMotion ? [1, 1, 1] : [1.1, 1, 1.05]
+  );
 
   return (
     <section
       ref={sectionRef}
       id="why-choose"
       className="py-20 lg:py-28 bg-dark-950 relative overflow-hidden"
-      aria-label="Why choose SL-LMS"
+      aria-labelledby={headingId}
     >
       {/* Background image with parallax zoom & heavy overlay */}
       <div className="absolute inset-0" aria-hidden="true">
@@ -52,10 +58,11 @@ export default function WhyChoose() {
       <Container className="relative z-10">
         <ScrollReveal variant="fadeUp">
           <SectionHeading
+            id={headingId}
             badge="Why SL-LMS?"
             title="Trust Built Into Every Interaction"
             subtitle="We're not just another legal directory. SL-LMS is purpose-built for Sri Lanka's legal ecosystem, ensuring trust, security, and accessibility at every step."
-            maxWidth="max-w-5xl"
+            maxWidth="max-w-3xl"
           />
         </ScrollReveal>
 
@@ -79,7 +86,7 @@ export default function WhyChoose() {
                     className="h-full"
                   >
                     <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileHover={reduceMotion ? undefined : { scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <IconBox icon={Icon} color="gold" size="md" className="mb-5" />
@@ -88,7 +95,7 @@ export default function WhyChoose() {
                     <h3 className="text-xl font-semibold text-neutral-50 mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-neutral-400 leading-relaxed">
+                    <p className="text-sm text-neutral-300 leading-relaxed">
                       {item.description}
                     </p>
                   </Card>

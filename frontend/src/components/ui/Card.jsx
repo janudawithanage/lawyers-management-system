@@ -10,7 +10,7 @@
  */
 
 import { forwardRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@utils";
 
 const variantClasses = {
@@ -19,6 +19,15 @@ const variantClasses = {
   elevated:
     "bg-dark-700/60 border border-white/6 shadow-xl shadow-black/20 hover:border-gold-500/20 hover:shadow-gold-500/5 backdrop-blur-sm",
   flat: "bg-dark-800/60 border border-white/6",
+};
+
+const roundedClasses = {
+  none: "rounded-none",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+  "2xl": "rounded-2xl",
+  "3xl": "rounded-3xl",
+  full: "rounded-full",
 };
 
 const paddingClasses = {
@@ -45,8 +54,13 @@ const Card = forwardRef(
     },
     ref
   ) => {
+    const reduceMotion = useReducedMotion();
     const classes = cn(
-      "rounded-" + rounded,
+      // Must be a literal class string: Tailwind extracts classes by scanning
+      // source text, so a concatenated `"rounded-" + rounded` is never
+      // generated and only worked by accident when the same literal happened
+      // to appear elsewhere in the codebase.
+      roundedClasses[rounded] ?? roundedClasses["2xl"],
       "transition-all duration-300",
       variantClasses[variant],
       paddingClasses[padding],
@@ -58,11 +72,11 @@ const Card = forwardRef(
       return (
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 30 }}
+          whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ delay: animationDelay }}
-          whileHover={hover ? { y: -4 } : undefined}
+          transition={{ delay: reduceMotion ? 0 : animationDelay }}
+          whileHover={hover && !reduceMotion ? { y: -4 } : undefined}
           className={classes}
           {...props}
         >

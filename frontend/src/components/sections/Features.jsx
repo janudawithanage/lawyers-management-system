@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useId } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Shield,
   Calendar,
@@ -15,16 +16,20 @@ import { IMAGES } from "../../config/images";
 const iconMap = { Shield, Calendar, FileSearch, BadgeCheck, Languages, Bell };
 
 export default function Features() {
+  const reduceMotion = useReducedMotion();
+  const headingId = useId();
+
   return (
-    <section id="features" className="py-20 lg:py-28 bg-dark-900 relative overflow-hidden" aria-label="Key features">
+    <section
+      id="features"
+      className="py-20 lg:py-28 bg-dark-900 relative overflow-hidden"
+      aria-labelledby={headingId}
+    >
       {/* Animated background accent */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <motion.div
           className="absolute top-1/4 right-0 w-[600px] h-[600px] rounded-full"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.03, 0.06, 0.03],
-          }}
+          animate={reduceMotion ? undefined : { scale: [1, 1.1, 1], opacity: [0.03, 0.06, 0.03] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           style={{
             background: "radial-gradient(circle, rgba(198,167,94,0.08), transparent 70%)",
@@ -36,10 +41,11 @@ export default function Features() {
       <Container className="relative z-10">
         <ScrollReveal variant="fadeUp">
           <SectionHeading
+            id={headingId}
             badge="Platform Features"
             title="Everything You Need for Legal Management"
             subtitle="A comprehensive suite of tools designed to streamline legal services across Sri Lanka."
-            maxWidth="max-w-6xl"
+            maxWidth="max-w-3xl"
           />
         </ScrollReveal>
 
@@ -71,7 +77,7 @@ export default function Features() {
                       <h3 className="text-lg font-semibold text-neutral-100 mb-2">
                         {feature.title}
                       </h3>
-                      <p className="text-sm text-neutral-500 leading-relaxed">
+                      <p className="text-sm text-neutral-400 leading-relaxed">
                         {feature.description}
                       </p>
                     </div>
@@ -88,7 +94,8 @@ export default function Features() {
             <div className="relative rounded-2xl overflow-hidden border border-white/6 h-48 sm:h-64">
               <img
                 src={IMAGES.sections.consultation.src}
-                alt={IMAGES.sections.consultation.alt}
+                alt=""
+                aria-hidden="true"
                 className="w-full h-full object-cover opacity-30"
                 loading="lazy"
                 decoding="async"
@@ -99,7 +106,7 @@ export default function Features() {
                   <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-50 mb-2">
                     Built for <span className="gradient-gold-text">Sri Lanka&apos;s</span> Legal Ecosystem
                   </h3>
-                  <p className="text-neutral-400 text-sm sm:text-base max-w-lg">
+                  <p className="text-neutral-300 text-sm sm:text-base measure">
                     Every feature designed with the unique needs of Sri Lankan legal professionals and their clients in mind.
                   </p>
                 </div>

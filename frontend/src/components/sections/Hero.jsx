@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   ShieldCheck,
@@ -9,54 +9,100 @@ import {
   Star,
 } from "lucide-react";
 import { TRUST_INDICATORS } from "../../constants";
-import { Button, Container, Badge } from "../ui";
+import { Button, Container } from "../ui";
 import { OptimizedImage, ParticleField, FloatingScale3D } from "../common";
 import { IMAGES } from "../../config/images";
 
 /* ─── Animation Variants ─── */
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 32 },
+const fadeUp = (delay = 0, reduce = false) => ({
+  initial: reduce ? { opacity: 0 } : { opacity: 0, y: 32 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] },
+  transition: {
+    duration: reduce ? 0.3 : 0.75,
+    delay: reduce ? 0 : delay,
+    ease: [0.22, 1, 0.36, 1],
+  },
 });
 
-const fadeIn = (delay = 0) => ({
+const fadeIn = (delay = 0, reduce = false) => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
-  transition: { duration: 0.6, delay },
+  transition: { duration: 0.6, delay: reduce ? 0 : delay },
 });
+
+/**
+ * The three proof points. Rendered as floating glass cards over the portrait
+ * on desktop, and as a compact inline list on mobile — previously the entire
+ * right column was `hidden lg:block`, so phone visitors lost all three. On a
+ * platform whose whole proposition is "these lawyers are genuinely verified",
+ * hiding the verification proof from the majority of traffic is the wrong
+ * thing to drop first.
+ */
+const PROOF_POINTS = [
+  {
+    icon: ShieldCheck,
+    title: "BASL Verified",
+    detail: "Credentials checked",
+    tone: "emerald",
+  },
+  {
+    icon: FileCheck,
+    title: "Documents Secured",
+    detail: "End-to-end encrypted",
+    tone: "emerald",
+  },
+  {
+    icon: Scale,
+    title: "BASL Compliant",
+    detail: "Professional standards",
+    tone: "gold",
+  },
+];
 
 export default function Hero() {
   const sectionRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Parallax transforms
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-  const scaleOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const gridOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  // Parallax transforms — flattened when the visitor asks for reduced motion.
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", reduceMotion ? "0%" : "30%"]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", reduceMotion ? "0%" : "15%"]);
+  const scaleOpacity = useTransform(scrollYProgress, [0, 0.5], [1, reduceMotion ? 1 : 0]);
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.6], [1, reduceMotion ? 1 : 0]);
+
+  /** Infinite drift, suppressed under reduced motion. */
+  const float = (distance, duration, delay = 0) =>
+    reduceMotion
+      ? {}
+      : {
+          animate: { y: [0, distance, 0] },
+          transition: { duration, repeat: Infinity, ease: "easeInOut", delay },
+        };
 
   return (
     <section
       ref={sectionRef}
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden"
-      aria-label="Hero"
+      /* 100svh, not 100vh: on mobile browsers 100vh includes the collapsing
+         URL bar, so a vh-sized hero gets clipped on load and then jumps as
+         the bar retracts. svh tracks the actually-visible viewport. */
+      className="relative min-h-[100svh] flex items-center overflow-hidden"
+      aria-labelledby="hero-heading"
       style={{
         background:
           "linear-gradient(160deg, #0A0A0B 0%, #0D0D0F 30%, #111113 60%, #0B0B0D 100%)",
       }}
     >
-      {/* ── Atmospheric Background with Parallax ── */}
+      {/* ── Atmospheric Background ── */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
         style={{ y: bgY }}
       >
-        {/* Primary gold orb — top right */}
         <div
           className="absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full"
           style={{
@@ -65,7 +111,6 @@ export default function Hero() {
             filter: "blur(60px)",
           }}
         />
-        {/* Secondary gold orb — bottom left */}
         <div
           className="absolute -bottom-48 -left-24 w-[500px] h-[500px] rounded-full"
           style={{
@@ -74,7 +119,6 @@ export default function Hero() {
             filter: "blur(80px)",
           }}
         />
-        {/* Center warmth */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full"
           style={{
@@ -84,10 +128,8 @@ export default function Hero() {
           }}
         />
 
-        {/* ── Interactive Particle Constellation ── */}
         <ParticleField particleCount={35} connectionDistance={120} />
 
-        {/* Animated grid overlay with scroll fade */}
         <motion.div
           className="absolute inset-0"
           style={{
@@ -100,7 +142,6 @@ export default function Hero() {
           }}
         />
 
-        {/* Noise texture for depth */}
         <div
           className="absolute inset-0 opacity-[0.015]"
           style={{
@@ -108,7 +149,6 @@ export default function Hero() {
           }}
         />
 
-        {/* Bottom fade to next section */}
         <div
           className="absolute bottom-0 left-0 right-0 h-56"
           style={{
@@ -118,50 +158,53 @@ export default function Hero() {
         />
       </motion.div>
 
-      <Container className="relative z-10 pt-32 pb-24">
+      <Container className="relative z-10 pt-28 pb-28 lg:pt-32 lg:pb-32">
         <motion.div
           className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center"
           style={{ y: contentY }}
         >
-
-          {/* ── LEFT COLUMN — Copy ── */}
+          {/* ── LEFT — Copy ── */}
           <div>
-            {/* Eyebrow badge */}
-            <motion.div {...fadeIn(0.1)} className="mb-7">
+            {/* Eyebrow. The full attribution is long at 11px with wide
+                tracking, so phones get the short form. */}
+            <motion.div {...fadeIn(0.1, reduceMotion)} className="mb-7">
               <span
-                className="inline-flex items-center gap-2.5 text-[11px] font-bold tracking-[0.18em] uppercase"
+                className="inline-flex items-center gap-2.5 text-[11px] font-bold tracking-[0.16em] uppercase"
                 style={{
                   background:
                     "linear-gradient(135deg, rgba(198,167,94,0.12), rgba(198,167,94,0.05))",
                   border: "1px solid rgba(198,167,94,0.22)",
-                  color: "#C6A75E",
+                  color: "#D7BC78",
                   borderRadius: "100px",
                   padding: "8px 18px",
                 }}
               >
                 <span
-                  className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-400 motion-safe:animate-pulse shrink-0"
                   style={{ boxShadow: "0 0 6px rgba(52,211,153,0.8)" }}
+                  aria-hidden="true"
                 />
-                Bar Association of Sri Lanka — Verified Platform
+                <span className="sm:hidden">BASL Verified Platform</span>
+                <span className="hidden sm:inline">
+                  Bar Association of Sri Lanka — Verified Platform
+                </span>
               </span>
             </motion.div>
 
-            {/* Gold divider line */}
             <motion.div
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: "3rem", opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="h-px mb-7"
+              aria-hidden="true"
               style={{
-                background:
-                  "linear-gradient(90deg, #C6A75E, rgba(198,167,94,0.2))",
+                background: "linear-gradient(90deg, #C6A75E, rgba(198,167,94,0.2))",
               }}
             />
 
-            {/* H1 — Headline */}
             <motion.h1
-              {...fadeUp(0.25)}
+              id="hero-heading"
+              {...fadeUp(0.25, reduceMotion)}
               className="font-serif font-bold leading-[1.08] text-balance mb-7"
               style={{
                 fontSize: "clamp(2.5rem, 5vw, 3.85rem)",
@@ -184,41 +227,64 @@ export default function Hero() {
               Across Sri Lanka
             </motion.h1>
 
-            {/* Subheading */}
             <motion.p
-              {...fadeUp(0.35)}
-              className="leading-relaxed mb-10"
-              style={{
-                fontSize: "1.125rem",
-                color: "#8A8A95",
-                maxWidth: "34rem",
-                lineHeight: "1.75",
-              }}
+              {...fadeUp(0.35, reduceMotion)}
+              className="measure text-lg leading-[1.75] mb-10 text-neutral-300"
             >
               Find expert legal representation in your district and preferred
               language. Book consultations, share documents securely, and track
               your case — all through one trusted platform.
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div
-              {...fadeUp(0.42)}
-              className="flex flex-wrap gap-4 mb-12"
-            >
+            <motion.div {...fadeUp(0.42, reduceMotion)} className="flex flex-wrap gap-4 mb-12">
               <Button variant="primary" size="lg" href="#search">
-                <Search className="w-4 h-4" />
+                <Search className="w-4 h-4" aria-hidden="true" />
                 Find a Lawyer
               </Button>
               <Button variant="secondary" size="lg" href="/register">
                 Register as Lawyer
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Button>
             </motion.div>
 
-            {/* Divider before stats */}
+            {/* ── Mobile proof points (desktop shows these as floating cards) ── */}
+            <motion.ul
+              {...fadeIn(0.5, reduceMotion)}
+              className="lg:hidden flex flex-col gap-2.5 mb-10 list-none"
+            >
+              {PROOF_POINTS.map(({ icon: Icon, title, detail, tone }) => (
+                <li
+                  key={title}
+                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 bg-dark-800/60 border border-white/8 backdrop-blur-sm"
+                >
+                  <span
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      tone === "gold"
+                        ? "bg-gold-500/10 border border-gold-500/20"
+                        : "bg-emerald-500/10 border border-emerald-500/20"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <Icon
+                      className={`w-4.5 h-4.5 ${
+                        tone === "gold" ? "text-gold-400" : "text-emerald-400"
+                      }`}
+                    />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-neutral-100">
+                      {title}
+                    </span>
+                    <span className="block text-xs text-neutral-400">{detail}</span>
+                  </span>
+                </li>
+              ))}
+            </motion.ul>
+
             <motion.div
-              {...fadeIn(0.5)}
+              {...fadeIn(0.5, reduceMotion)}
               className="mb-7"
+              aria-hidden="true"
               style={{
                 height: "1px",
                 background:
@@ -226,10 +292,10 @@ export default function Hero() {
               }}
             />
 
-            {/* Trust Stats */}
-            <motion.div
-              {...fadeIn(0.55)}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-px"
+            {/* ── Trust stats ── */}
+            <motion.dl
+              {...fadeIn(0.55, reduceMotion)}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-px m-0"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 borderRadius: "16px",
@@ -240,9 +306,9 @@ export default function Hero() {
               {TRUST_INDICATORS.map((item, idx) => (
                 <motion.div
                   key={item.label}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + idx * 0.08 }}
+                  transition={{ delay: reduceMotion ? 0 : 0.6 + idx * 0.08 }}
                   className="flex flex-col items-center justify-center py-5 px-3 text-center relative"
                   style={{ background: "rgba(11,11,12,0.6)" }}
                 >
@@ -250,36 +316,37 @@ export default function Hero() {
                     <div
                       className="absolute right-0 top-3 bottom-3 w-px hidden sm:block"
                       style={{ background: "rgba(255,255,255,0.05)" }}
+                      aria-hidden="true"
                     />
                   )}
-                  <div
-                    className="font-serif font-bold text-2xl mb-1"
+                  <dt className="sr-only">{item.label}</dt>
+                  <dd
+                    className="font-serif font-bold text-2xl mb-1 m-0"
                     style={{
-                      background:
-                        "linear-gradient(135deg, #E8C15C, #C6A75E)",
+                      background: "linear-gradient(135deg, #E8C15C, #C6A75E)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
                     }}
                   >
                     {item.value}
-                  </div>
-                  <div
-                    className="text-[11px] font-medium tracking-wide"
-                    style={{ color: "#5A5A63" }}
+                  </dd>
+                  {/* Was #5A5A63 at 11px — roughly 2.6:1 against this surface,
+                      which fails WCAG AA (4.5:1) for body text. neutral-400
+                      clears 8:1 and the label is now 12px. */}
+                  <span
+                    className="text-xs font-medium tracking-wide text-neutral-400"
+                    aria-hidden="true"
                   >
                     {item.label}
-                  </div>
+                  </span>
                 </motion.div>
               ))}
-            </motion.div>
+            </motion.dl>
 
-            {/* Social proof strip */}
-            <motion.div
-              {...fadeIn(0.75)}
-              className="flex items-center gap-3 mt-6"
-            >
-              <div className="flex -space-x-2">
+            {/* ── Social proof ── */}
+            <motion.div {...fadeIn(0.75, reduceMotion)} className="flex items-center gap-3 mt-6">
+              <div className="flex -space-x-2" aria-hidden="true">
                 {[
                   "photo-1573496359142-b8d87734a5a2",
                   "photo-1507003211169-0a1dd7228f2d",
@@ -288,7 +355,11 @@ export default function Hero() {
                   <img
                     key={i}
                     src={`https://images.unsplash.com/${id}?w=48&h=48&auto=format&fit=crop&crop=face&q=80`}
-                    alt="Verified lawyer"
+                    alt=""
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    decoding="async"
                     className="w-8 h-8 rounded-full object-cover"
                     style={{
                       border: "2px solid #0B0B0C",
@@ -298,31 +369,30 @@ export default function Hero() {
                 ))}
               </div>
               <div>
-                <div className="flex items-center gap-1 mb-0.5">
+                <div className="flex items-center gap-1 mb-0.5" aria-hidden="true">
                   {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-3 h-3 fill-gold-400 text-gold-400"
-                    />
+                    <Star key={i} className="w-3 h-3 fill-gold-400 text-gold-400" />
                   ))}
                 </div>
-                <p style={{ fontSize: "11px", color: "#5A5A63" }}>
-                  Trusted by{" "}
-                  <span style={{ color: "#8A8A95" }}>10,000+ Sri Lankans</span>
+                <p className="text-xs text-neutral-400">
+                  Rated 5 stars by{" "}
+                  <span className="text-neutral-200 font-medium">
+                    10,000+ Sri Lankans
+                  </span>
                 </p>
               </div>
             </motion.div>
           </div>
 
-          {/* ── RIGHT COLUMN — Visual with 3D Scale ── */}
+          {/* ── RIGHT — Visual ── */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: reduceMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="hidden lg:block"
+            aria-hidden="true"
           >
             <div className="relative">
-              {/* ── 3D Animated Scale of Justice (behind image) ── */}
               <motion.div
                 className="absolute -top-20 -left-16 z-0"
                 style={{ opacity: scaleOpacity }}
@@ -330,7 +400,6 @@ export default function Hero() {
                 <FloatingScale3D className="opacity-60" />
               </motion.div>
 
-              {/* Main image card */}
               <div
                 className="relative rounded-3xl overflow-hidden z-10"
                 style={{
@@ -352,38 +421,29 @@ export default function Hero() {
                   overlayClassName="bg-linear-to-t from-dark-950/50 via-transparent to-transparent"
                   containerClassName="w-full h-[460px]"
                 />
-                {/* Gold shimmer border top */}
-                <motion.div
-                  className="absolute top-0 left-0 right-0 h-px"
-                  animate={{
-                    backgroundPosition: ["0% 0%", "200% 0%"],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  style={{
-                    backgroundSize: "200% 100%",
-                    backgroundImage:
-                      "linear-gradient(90deg, transparent, rgba(198,167,94,0.6) 20%, rgba(198,167,94,0.15) 50%, transparent 80%)",
-                  }}
-                />
+                {!reduceMotion && (
+                  <motion.div
+                    className="absolute top-0 left-0 right-0 h-px"
+                    animate={{ backgroundPosition: ["0% 0%", "200% 0%"] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    style={{
+                      backgroundSize: "200% 100%",
+                      backgroundImage:
+                        "linear-gradient(90deg, transparent, rgba(198,167,94,0.6) 20%, rgba(198,167,94,0.15) 50%, transparent 80%)",
+                    }}
+                  />
+                )}
               </div>
 
-              {/* Floating badge — BASL Verified (top right) */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-5 -right-5 z-20"
-              >
+              {/* Floating proof card — verification */}
+              <motion.div {...float(-8, 4.5)} className="absolute -top-5 -right-5 z-20">
                 <div
                   className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold"
                   style={{
                     background: "rgba(16,185,129,0.12)",
                     backdropFilter: "blur(16px)",
                     border: "1px solid rgba(52,211,153,0.25)",
-                    color: "#34D399",
+                    color: "#6EE7B7",
                     boxShadow:
                       "0 8px 32px rgba(16,185,129,0.15), inset 0 1px 0 rgba(255,255,255,0.08)",
                   }}
@@ -393,16 +453,12 @@ export default function Hero() {
                 </div>
               </motion.div>
 
-              {/* Floating card — Documents Secured (bottom right) */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -bottom-6 -right-4 z-20"
-              >
+              {/* Floating proof card — documents */}
+              <motion.div {...float(-10, 5.5, 1)} className="absolute -bottom-6 -right-4 z-20">
                 <div
                   className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
                   style={{
-                    background: "rgba(11,11,12,0.75)",
+                    background: "rgba(11,11,12,0.78)",
                     backdropFilter: "blur(24px)",
                     border: "1px solid rgba(255,255,255,0.08)",
                     boxShadow:
@@ -423,23 +479,20 @@ export default function Hero() {
                     <div className="text-sm font-semibold text-neutral-100">
                       Documents Secured
                     </div>
-                    <div className="text-xs mt-0.5" style={{ color: "#5A5A63" }}>
+                    {/* Was #5A5A63 — under 3:1. */}
+                    <div className="text-xs mt-0.5 text-neutral-400">
                       End-to-end encrypted
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Floating card — BASL Compliant (middle left) */}
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
-                className="absolute top-1/3 -left-8 z-20"
-              >
+              {/* Floating proof card — compliance */}
+              <motion.div {...float(10, 6, 2.5)} className="absolute top-1/3 -left-8 z-20">
                 <div
                   className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
                   style={{
-                    background: "rgba(11,11,12,0.75)",
+                    background: "rgba(11,11,12,0.78)",
                     backdropFilter: "blur(24px)",
                     border: "1px solid rgba(198,167,94,0.12)",
                     boxShadow:
@@ -460,14 +513,13 @@ export default function Hero() {
                     <div className="text-sm font-semibold text-neutral-100">
                       BASL Compliant
                     </div>
-                    <div className="text-xs mt-0.5" style={{ color: "#5A5A63" }}>
+                    <div className="text-xs mt-0.5 text-neutral-400">
                       Verified credentials
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Decorative glow behind image */}
               <div
                 className="absolute -inset-4 -z-10 rounded-3xl"
                 style={{
@@ -481,26 +533,29 @@ export default function Hero() {
         </motion.div>
       </Container>
 
-      {/* ── Scroll Indicator ── */}
+      {/* ── Scroll cue ──
+          Only shown on tall viewports. It used to sit at bottom-8 regardless
+          of height, so on a 13" laptop it landed on top of the trust stats. */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 hidden xl:flex flex-col items-center gap-2 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
+        aria-hidden="true"
       >
-        <span className="text-[10px] font-medium tracking-[0.2em] uppercase" style={{ color: "#4A4A52" }}>
+        <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-neutral-400">
           Scroll to explore
         </span>
-        <motion.div
-          className="w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1"
+        <div
+          className="w-5 h-8 rounded-full border border-white/15 flex items-start justify-center p-1"
           style={{ background: "rgba(255,255,255,0.02)" }}
         >
           <motion.div
-            className="w-1 h-2 rounded-full bg-gold-400/50"
-            animate={{ y: [0, 12, 0] }}
+            className="w-1 h-2 rounded-full bg-gold-400/70"
+            animate={reduceMotion ? {} : { y: [0, 12, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
-        </motion.div>
+        </div>
       </motion.div>
     </section>
   );
