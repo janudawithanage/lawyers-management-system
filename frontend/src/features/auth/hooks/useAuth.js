@@ -100,7 +100,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     refreshUser,
-    isAuthenticated: !!user,
+    isAuthenticated: Boolean(user),
     isClient: user?.role === "client",
     isLawyer: user?.role === "lawyer",
     isAdmin: user?.role === "admin",

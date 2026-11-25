@@ -17,7 +17,7 @@ import {
   CheckCircle, ArrowRight, User, Briefcase,
   PlayCircle, MessageSquare, FileText, Plus,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 import { AppointmentStatus } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";

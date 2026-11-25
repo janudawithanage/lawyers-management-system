@@ -42,9 +42,9 @@ frontend/
 │   ├── routes/
 │   │   └── index.jsx               ✅ Routes configured
 │   └── index.css                   ✅ Animations added
-├── AUTH_SYSTEM_DOCS.md             ✅ Complete documentation
-└── SECURITY_GUIDELINES.md          ✅ Security best practices
 ```
+
+(The markdown documents this tree used to list now live in `docs/`.)
 
 ---
 
@@ -53,8 +53,9 @@ frontend/
 ### 1. Start Development Server
 
 ```bash
-cd frontend
-npm run dev
+cp .env.example .env   # once, at the repository root — see ENVIRONMENT.md
+npm install            # once, at the repository root
+npm run dev:frontend
 ```
 
 ### 2. Visit Authentication Pages

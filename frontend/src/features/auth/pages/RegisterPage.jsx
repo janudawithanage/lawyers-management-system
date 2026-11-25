@@ -17,7 +17,7 @@ import {
   validatePhone,
   validateName,
 } from "../validation/authValidation";
-import { useAuth, getDashboardPath } from "@context/AuthContext";
+import { useAuth, getDashboardPath } from "@context/auth-context";
 
 export default function RegisterPage() {
   const navigate = useNavigate();

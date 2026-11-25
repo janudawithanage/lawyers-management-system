@@ -61,7 +61,7 @@ export default function ProfileSettings() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSave = (formData) => {
+  const handleSave = (_formData) => {
     // Future: PUT /api/v1/client/profile
   };
 

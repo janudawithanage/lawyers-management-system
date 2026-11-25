@@ -29,7 +29,7 @@ import {
   User,
   FileText,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { PaymentStatus } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
 import CountdownTimer from "@components/common/CountdownTimer";
@@ -194,6 +194,12 @@ export default function MyPayments() {
   const [paymentModal, setPaymentModal] = useState({ open: false, payment: null });
 
   // ── Financial Stats ────────────────────────────────────────
+  // The clock is external, mutable state. Read it once when the page mounts so
+  // the "last 30 days" window is fixed for the life of the view instead of
+  // shifting on every re-render.
+  const [mountedAt] = useState(() => Date.now());
+  const thirtyDaysAgo = mountedAt - 30 * 86400000;
+
   const stats = useMemo(() => {
     const totalPaid = payments
       .filter((p) => p.status === PaymentStatus.SUCCESS)
@@ -203,9 +209,12 @@ export default function MyPayments() {
       .reduce((sum, p) => sum + p.amount, 0);
     const totalTransactions = payments.length;
     const pendingCount = payments.filter((p) => p.status === PaymentStatus.PENDING).length;
+    const paidLast30Days = payments
+      .filter((p) => p.status === PaymentStatus.SUCCESS && p.paidAt > thirtyDaysAgo)
+      .reduce((sum, p) => sum + p.amount, 0);
 
-    return { totalPaid, totalPending, totalTransactions, pendingCount };
-  }, [payments]);
+    return { totalPaid, totalPending, totalTransactions, pendingCount, paidLast30Days };
+  }, [payments, thirtyDaysAgo]);
 
   // ── Filter ─────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -284,10 +293,7 @@ export default function MyPayments() {
         <StatCard
           icon={TrendingUp}
           label="This Month"
-          value={`LKR ${payments
-            .filter((p) => p.status === PaymentStatus.SUCCESS && p.paidAt > Date.now() - 30 * 86400000)
-            .reduce((s, p) => s + p.amount, 0)
-            .toLocaleString()}`}
+          value={`LKR ${stats.paidLast30Days.toLocaleString()}`}
           subtext="Last 30 days"
           color="gold"
         />

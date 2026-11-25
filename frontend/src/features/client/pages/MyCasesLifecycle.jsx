@@ -29,7 +29,7 @@ import {
   AlertTriangle,
   ChevronRight,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { CaseStatus, PaymentStatus } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
 import CountdownTimer from "@components/common/CountdownTimer";

@@ -47,6 +47,27 @@ const SPEC_OPTIONS = ["Commercial Law", "Criminal Law", "Family Law", "Corporate
 const LANG_OPTIONS = ["Sinhala", "Tamil", "English"];
 const DISTRICT_OPTIONS = ["Colombo", "Gampaha", "Kandy", "Galle", "Matara", "Kurunegala", "Jaffna", "Batticaloa", "Trincomalee", "Anuradhapura"];
 
+// ── Presentational pieces ─────────────────────────────────────
+// Declared at module scope. Defined inside the page component this was a new
+// component type on every render, so each keystroke remounted the input and
+// dropped the caret.
+
+function InputField({ label, type = "text", value, onChange }) {
+  return (
+    <div>
+      <label className="block text-[11px] font-medium text-neutral-500 uppercase tracking-wider mb-1.5">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        className="w-full px-4 py-2.5 rounded-xl text-sm text-neutral-200 bg-dark-800/60 border border-white/[0.06] placeholder:text-neutral-600 focus:outline-none focus:border-[#C6A75E]/30 transition-colors"
+      />
+    </div>
+  );
+}
+
 export default function LawyerProfile() {
   const [profile, setProfile] = useState(INITIAL_PROFILE);
   const [saved, setSaved] = useState(false);
@@ -66,14 +87,6 @@ export default function LawyerProfile() {
 
   const handleSave = () => setSaved(true);
   const handleReset = () => { setProfile(INITIAL_PROFILE); setSaved(false); };
-
-  const InputField = ({ label, field, type = "text" }) => (
-    <div>
-      <label className="block text-[11px] font-medium text-neutral-500 uppercase tracking-wider mb-1.5">{label}</label>
-      <input type={type} value={profile[field]} onChange={(e) => handleChange(field, e.target.value)}
-        className="w-full px-4 py-2.5 rounded-xl text-sm text-neutral-200 bg-dark-800/60 border border-white/[0.06] placeholder:text-neutral-600 focus:outline-none focus:border-[#C6A75E]/30 transition-colors" />
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -151,10 +164,10 @@ export default function LawyerProfile() {
           <div className="p-5 rounded-xl bg-dark-800/40 border border-white/[0.06]">
             <h2 className="text-base font-semibold text-neutral-200 mb-4">Personal Information</h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              <InputField label="Full Name" field="fullName" />
-              <InputField label="Professional Title" field="title" />
-              <InputField label="Email" field="email" type="email" />
-              <InputField label="Phone" field="phone" type="tel" />
+              <InputField label="Full Name" value={profile.fullName} onChange={(e) => handleChange("fullName", e.target.value)} />
+              <InputField label="Professional Title" value={profile.title} onChange={(e) => handleChange("title", e.target.value)} />
+              <InputField label="Email" type="email" value={profile.email} onChange={(e) => handleChange("email", e.target.value)} />
+              <InputField label="Phone" type="tel" value={profile.phone} onChange={(e) => handleChange("phone", e.target.value)} />
             </div>
           </div>
 
@@ -162,10 +175,10 @@ export default function LawyerProfile() {
           <div className="p-5 rounded-xl bg-dark-800/40 border border-white/[0.06]">
             <h2 className="text-base font-semibold text-neutral-200 mb-4">Bar Association Details</h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              <InputField label="Bar Number" field="barNumber" />
-              <InputField label="Enrollment Year" field="enrollmentYear" />
+              <InputField label="Bar Number" value={profile.barNumber} onChange={(e) => handleChange("barNumber", e.target.value)} />
+              <InputField label="Enrollment Year" value={profile.enrollmentYear} onChange={(e) => handleChange("enrollmentYear", e.target.value)} />
               <div className="sm:col-span-2">
-                <InputField label="Years of Experience" field="experience" type="number" />
+                <InputField label="Years of Experience" type="number" value={profile.experience} onChange={(e) => handleChange("experience", e.target.value)} />
               </div>
             </div>
           </div>

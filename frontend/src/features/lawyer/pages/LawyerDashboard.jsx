@@ -39,7 +39,7 @@ import {
   TrendingUp,
   Bell,
 } from "lucide-react";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import useLawyerStore from "../hooks/useLawyerStore";
 import { StatusBadge, CountdownTimer, ActivityFeed } from "@components/common";
 import { AppointmentStatus, CaseStatus } from "@utils/statusEnums";
@@ -251,7 +251,6 @@ export default function LawyerDashboard() {
 
   const {
     myAppointments,
-    myCases,
     myNotifications,
     todaysAppointments,
     pendingRequests,

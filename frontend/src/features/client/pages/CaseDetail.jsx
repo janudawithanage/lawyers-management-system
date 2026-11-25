@@ -49,7 +49,7 @@ import {
   CalendarPlus,
   ListChecks,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { CaseStatus, PaymentStatus } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
 import CountdownTimer from "@components/common/CountdownTimer";
@@ -181,8 +181,7 @@ function UploadProgressItem({ file, onComplete, onRemove }) {
 //  OVERVIEW TAB
 // ══════════════════════════════════════════════════════════════
 
-function OverviewTab({ caseData, relatedPayments }) {
-  const isActive = caseData.status === CaseStatus.ACTIVE;
+function OverviewTab({ caseData }) {
   const isPending = caseData.status === CaseStatus.PAYMENT_PENDING;
   const isOverdue = caseData.status === CaseStatus.OVERDUE;
   const dueAmount = (caseData.totalFees || 0) - (caseData.paidAmount || 0);
@@ -327,6 +326,11 @@ function DocumentsTab({ caseData, onUpload, onRemoveDocument }) {
     setIsDragging(false);
   }, []);
 
+  const handleFiles = useCallback((files) => {
+    const valid = files.filter((f) => f.size <= MAX_FILE_SIZE);
+    setUploading((prev) => [...prev, ...valid]);
+  }, []);
+
   const handleDrop = useCallback(
     (e) => {
       e.preventDefault();
@@ -335,18 +339,13 @@ function DocumentsTab({ caseData, onUpload, onRemoveDocument }) {
       const files = Array.from(e.dataTransfer.files);
       handleFiles(files);
     },
-    [isEditable]
+    [isEditable, handleFiles]
   );
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     handleFiles(files);
     e.target.value = "";
-  };
-
-  const handleFiles = (files) => {
-    const valid = files.filter((f) => f.size <= MAX_FILE_SIZE);
-    setUploading((prev) => [...prev, ...valid]);
   };
 
   const handleUploadComplete = useCallback(
@@ -874,7 +873,6 @@ export default function CaseDetail() {
   const isActive = caseData?.status === CaseStatus.ACTIVE;
   const isPending = caseData?.status === CaseStatus.PAYMENT_PENDING;
   const isOverdue = caseData?.status === CaseStatus.OVERDUE;
-  const isClosed = [CaseStatus.CLOSED, CaseStatus.ENDED, CaseStatus.TERMINATED].includes(caseData?.status);
 
   // Handlers
   const handleOpenPayment = useCallback((cd, payment) => {
@@ -1190,7 +1188,7 @@ export default function CaseDetail() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
         >
-          {activeTab === "overview" && <OverviewTab caseData={caseData} relatedPayments={relatedPayments} />}
+          {activeTab === "overview" && <OverviewTab caseData={caseData} />}
 
           {activeTab === "documents" && (
             <DocumentsTab caseData={caseData} onUpload={handleUploadDocument} onRemoveDocument={handleRemoveDocument} />

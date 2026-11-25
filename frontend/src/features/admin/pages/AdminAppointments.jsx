@@ -28,7 +28,7 @@ import {
   Scale,
   ArrowUpDown,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { AppointmentStatus } from "@utils/statusEnums";
 
 // ── Status Configuration ─────────────────────────────────────

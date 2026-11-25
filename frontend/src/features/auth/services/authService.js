@@ -7,7 +7,9 @@
 
 // This is a mock implementation. Replace with actual API calls.
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import config from "@config";
+
+const API_BASE_URL = config.api.baseUrl;
 
 /**
  * Simulate API delay
@@ -22,7 +24,7 @@ export const authService = {
   /**
    * Login user
    */
-  async login({ email, password, rememberMe }) {
+  async login({ email, password, rememberMe: _rememberMe }) {
     await delay(1500); // Simulate network delay
 
     // Mock validation
@@ -31,7 +33,7 @@ export const authService = {
         token: "mock-jwt-token-" + Date.now(),
         user: {
           id: "USR-2026-0001",
-          email: email,
+          email,
           fullName: "Ashan Bandara",
           role: "client",
           verified: true,
@@ -45,7 +47,7 @@ export const authService = {
         token: "mock-jwt-token-" + Date.now(),
         user: {
           id: "LWR-003",
-          email: email,
+          email,
           fullName: "Atty. Ranjan de Silva",
           role: "lawyer",
           verified: true,
@@ -61,7 +63,7 @@ export const authService = {
         token: "mock-jwt-token-" + Date.now(),
         user: {
           id: "user-789",
-          email: email,
+          email,
           fullName: "Platform Admin",
           role: "admin",
           verified: true,
@@ -244,6 +246,7 @@ export const authService = {
    */
   async verifyEmail(token) {
     await delay(1000);
+    if (!token) throw new Error("Verification token is required");
     return { success: true, message: "Email verified successfully" };
 
     /* 
@@ -273,6 +276,7 @@ export const authService = {
    */
   async requestPasswordReset(email) {
     await delay(1000);
+    if (!email) throw new Error("Email address is required");
     return { success: true, message: "Password reset email sent" };
 
     /* 
@@ -302,6 +306,7 @@ export const authService = {
    */
   async resetPassword({ token, password }) {
     await delay(1000);
+    if (!token || !password) throw new Error("Reset token and new password are required");
     return { success: true, message: "Password reset successful" };
 
     /* 

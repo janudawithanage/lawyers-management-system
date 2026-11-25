@@ -10,7 +10,7 @@
  *   • Redirects to case detail on success
  */
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -18,7 +18,7 @@ import {
   DollarSign, FileText, CheckCircle, Calendar,
   Video, Building2, Phone, ChevronDown,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 import { AppointmentStatus } from "@utils/statusEnums";
 
@@ -45,24 +45,26 @@ export default function LawyerNewCase() {
 
   // ── Form State ─────────────────────────────────────────────
   const preselectedId = searchParams.get("appointmentId") || "";
+  const preselectedApt = appointments.find((a) => a.id === preselectedId);
+
   const [selectedAptId, setSelectedAptId] = useState(preselectedId);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [caseType, setCaseType] = useState("");
+  const [description, setDescription] = useState(preselectedApt?.description || "");
+  const [caseType, setCaseType] = useState(preselectedApt?.caseType || "");
   const [estimatedFees, setEstimatedFees] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  // ── Auto-fill from selected appointment ────────────────────
-  const selectedApt = useMemo(() => {
-    return appointments.find((a) => a.id === selectedAptId);
-  }, [appointments, selectedAptId]);
+  // Prefill on the user's selection rather than from an effect watching it:
+  // an effect would write state during a render it had just caused, and the
+  // "only if still blank" guard then depends on which render won.
+  const handleSelectAppointment = (appointmentId) => {
+    setSelectedAptId(appointmentId);
 
-  useEffect(() => {
-    if (selectedApt) {
-      if (!caseType) setCaseType(selectedApt.caseType || "");
-      if (!description) setDescription(selectedApt.description || "");
-    }
-  }, [selectedAptId]); // eslint-disable-line react-hooks/exhaustive-deps
+    const apt = appointments.find((a) => a.id === appointmentId);
+    if (!apt) return;
+    if (!caseType) setCaseType(apt.caseType || "");
+    if (!description) setDescription(apt.description || "");
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -143,7 +145,7 @@ export default function LawyerNewCase() {
                   <button
                     key={apt.id}
                     type="button"
-                    onClick={() => setSelectedAptId(apt.id)}
+                    onClick={() => handleSelectAppointment(apt.id)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all ${
                       selected
                         ? "bg-[#C6A75E]/10 border-[#C6A75E]/25"

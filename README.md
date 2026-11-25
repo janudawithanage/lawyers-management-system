@@ -1,67 +1,74 @@
-# Lawyers Management System
+# Sri Lanka Lawyer Management System (SL-LMS)
 
-Web-based management system scaffold for law firms and legal teams — includes a React + Vite frontend and example feature folders for authentication, admin, client, and lawyer workflows.
+A platform connecting clients with verified lawyers across Sri Lanka: search by
+specialisation, district and language, book appointments, upload case documents
+and track cases.
 
-## Overview
+Two packages in one repository — a React frontend and a Node.js API — sharing
+one install, one lint command and one environment file.
 
-This repository contains the frontend for a Lawyers Management System. The project is organized to separate features, layouts, components, and services to make it easy to extend and maintain.
+## Repository layout
 
-## Key Features
-
-- Modular React frontend with Vite
-- Role-based routing and protected routes
-- Auth context and token storage utilities
-- Example pages and UI components for dashboards
-- Mock data and API service stubs for local development
-
-## Tech Stack
-
-- Frontend: React, Vite, JSX, Tailwind/CSS (project styles)
-- Tooling: ESLint, Vite dev server
-
-## Repository Structure
-
-- `frontend/` — React application source
-	- `src/components/` — UI components and layout pieces
-	- `src/features/` — feature modules (auth, admin, client, lawyer)
-	- `src/services/` — API helpers and mock seed data
-	- `src/pages/` — top-level page components
-
-## Getting Started (Frontend)
-
-Prerequisites: Node.js 16+ and a package manager (`npm`/`pnpm`/`yarn`).
-
-1. Install dependencies
-
-```bash
-cd frontend
-npm install
+```
+lawyers-management-system/
+├── frontend/              React 19 + Vite 7 + Tailwind CSS 4 application
+├── backend/               Node.js API (Express), layered route → controller → service → repository
+│   ├── src/config/        environment loading and validation at boot
+│   ├── src/modules/       one folder per domain: auth, cases, appointments, documents, …
+│   ├── src/middleware/    authn, authz, validation, rate limit, error handler
+│   ├── src/lib/           logger, mailer, storage, token service
+│   ├── db/migrations/     versioned schema; up and down for every change
+│   └── db/seeds/          reference data and the fixture-equivalent seed
+├── docs/                  project documentation
+├── scripts/               repository operations
+├── .github/workflows/     continuous integration
+└── .env.example           environment template for both packages
 ```
 
-2. Run development server
+## Getting started
+
+Node.js 20.19 or newer.
 
 ```bash
-npm run dev
+cp .env.example .env     # fill in every value — see docs/ENVIRONMENT.md
+npm install              # at the root; the packages are npm workspaces
+npm run dev              # both packages, prefixed `api` and `web`
 ```
 
-3. Build for production
+| Command                                        | What it does                                            |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| `npm run dev`                                  | Frontend and API together                               |
+| `npm run dev:frontend` / `npm run dev:backend` | One at a time                                           |
+| `npm run build`                                | Builds the frontend and validates the API's environment |
+| `npm run lint`                                 | ESLint over the whole repository                        |
+| `npm run format`                               | Prettier over the whole repository                      |
 
-```bash
-npm run build
-```
+Nothing is defaulted: a missing or malformed environment variable stops the API
+at boot and fails the frontend build, naming the variable.
+[docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) has the detail.
 
-Notes:
-- The frontend contains a `mockSeedData.js` file to boot local mock data for development. If a backend is added later, update `src/services/api.js` to point to real endpoints.
+## Current state
+
+The frontend is substantially complete — 41 pages across client, lawyer and
+administrator dashboards, behind role-based route guards, with a full design
+system. It runs entirely on fixtures: there is no database yet, and sign-in is
+mocked in `frontend/src/features/auth/services/authService.js`.
+
+The backend is a scaffold. The environment layer, the Express application and
+the module structure are in place; the schema, the domain endpoints and
+authentication are the next phases of work.
 
 ## Contributing
 
-If you'd like to contribute, please open an issue to propose changes and then a pull request describing the change.
+`main` is protected and cannot be pushed to directly. Every change goes through
+a pull request, where CI runs install, lint and build.
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) has the workflow.
+
+## Documentation
+
+[docs/](docs/) — quick start, environment reference, contributing guide, and the
+authentication, routing and security notes.
 
 ## License
 
-This project is released under the MIT License. Replace with the appropriate license for your project.
-
-## Contact
-
-For questions or help, open an issue in this repository.
-
+MIT.

@@ -18,7 +18,7 @@ import { useLocation } from "react-router-dom";
 import { Menu, Search, Command } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import ProfileDropdown from "./ProfileDropdown";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { getNavigationForRole } from "@config/navigationConfig";
 import { DASHBOARD_ROUTES } from "@/routes/routeConfig";
 

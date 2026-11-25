@@ -134,7 +134,7 @@ export default function LawyerDetails() {
     navigate(`/dashboard/client/find-lawyer/${lawyer.lawyer_id}/book`);
   };
 
-  const handleChat = (lawyer) => {
+  const handleChat = (_lawyer) => {
     // Future: navigate to messages with lawyer
   };
 

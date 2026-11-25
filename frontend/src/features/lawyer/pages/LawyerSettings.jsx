@@ -43,6 +43,43 @@ const DEFAULT_SETTINGS = {
   sessionTimeout: "60",
 };
 
+// ── Presentational pieces ─────────────────────────────────────
+// Declared at module scope: a component created inside the render of its
+// parent is a new type on every render, which remounts it and loses its state.
+
+function Toggle({ label, description, checked, onToggle }) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
+      <div>
+        <p className="text-sm font-medium text-neutral-200">{label}</p>
+        {description && <p className="text-[11px] text-neutral-500 mt-0.5">{description}</p>}
+      </div>
+      <button
+        onClick={onToggle}
+        className={`w-10 h-6 rounded-full flex items-center transition-colors ${checked ? "bg-[#C6A75E]" : "bg-neutral-700"}`}
+      >
+        <motion.div
+          animate={{ x: checked ? 18 : 2 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          className="w-4 h-4 rounded-full bg-white shadow-sm"
+        />
+      </button>
+    </div>
+  );
+}
+
+function Section({ title, icon: Icon, children }) {
+  return (
+    <div className="p-5 rounded-xl bg-dark-800/40 border border-white/[0.06]">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="w-4 h-4 text-[#C6A75E]" />
+        <h2 className="text-base font-semibold text-neutral-200">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export default function LawyerSettings() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [saved, setSaved] = useState(false);
@@ -55,30 +92,6 @@ export default function LawyerSettings() {
   const toggle = (field) => update(field, !settings[field]);
   const handleSave = () => setSaved(true);
   const handleReset = () => { setSettings(DEFAULT_SETTINGS); setSaved(false); };
-
-  const Toggle = ({ field, label, description }) => (
-    <div className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
-      <div>
-        <p className="text-sm font-medium text-neutral-200">{label}</p>
-        {description && <p className="text-[11px] text-neutral-500 mt-0.5">{description}</p>}
-      </div>
-      <button onClick={() => toggle(field)}
-        className={`w-10 h-6 rounded-full flex items-center transition-colors ${settings[field] ? "bg-[#C6A75E]" : "bg-neutral-700"}`}>
-        <motion.div animate={{ x: settings[field] ? 18 : 2 }} transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className="w-4 h-4 rounded-full bg-white shadow-sm" />
-      </button>
-    </div>
-  );
-
-  const Section = ({ title, icon: Icon, children }) => (
-    <div className="p-5 rounded-xl bg-dark-800/40 border border-white/[0.06]">
-      <div className="flex items-center gap-2 mb-4">
-        <Icon className="w-4 h-4 text-[#C6A75E]" />
-        <h2 className="text-base font-semibold text-neutral-200">{title}</h2>
-      </div>
-      {children}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -128,18 +141,18 @@ export default function LawyerSettings() {
                 <option value="60">60 minutes</option>
               </select>
             </div>
-            <Toggle field="autoApproveAppointments" label="Auto-approve Appointments" description="Automatically confirm new appointment requests" />
+            <Toggle checked={settings.autoApproveAppointments} onToggle={() => toggle("autoApproveAppointments")} label="Auto-approve Appointments" description="Automatically confirm new appointment requests" />
           </div>
         </Section>
 
         {/* Notifications */}
         <Section title="Notification Preferences" icon={Bell}>
-          <Toggle field="emailNotifications" label="Email Notifications" description="Receive notifications via email" />
-          <Toggle field="smsNotifications" label="SMS Notifications" description="Receive notifications via SMS" />
-          <Toggle field="appointmentReminders" label="Appointment Reminders" description="Get reminders before scheduled appointments" />
-          <Toggle field="caseUpdates" label="Case Updates" description="Notifications when case status changes" />
-          <Toggle field="paymentAlerts" label="Payment Alerts" description="Get notified about incoming payments" />
-          <Toggle field="marketingEmails" label="Marketing Emails" description="Receive promotional content" />
+          <Toggle checked={settings.emailNotifications} onToggle={() => toggle("emailNotifications")} label="Email Notifications" description="Receive notifications via email" />
+          <Toggle checked={settings.smsNotifications} onToggle={() => toggle("smsNotifications")} label="SMS Notifications" description="Receive notifications via SMS" />
+          <Toggle checked={settings.appointmentReminders} onToggle={() => toggle("appointmentReminders")} label="Appointment Reminders" description="Get reminders before scheduled appointments" />
+          <Toggle checked={settings.caseUpdates} onToggle={() => toggle("caseUpdates")} label="Case Updates" description="Notifications when case status changes" />
+          <Toggle checked={settings.paymentAlerts} onToggle={() => toggle("paymentAlerts")} label="Payment Alerts" description="Get notified about incoming payments" />
+          <Toggle checked={settings.marketingEmails} onToggle={() => toggle("marketingEmails")} label="Marketing Emails" description="Receive promotional content" />
         </Section>
 
         {/* Privacy */}
@@ -153,14 +166,14 @@ export default function LawyerSettings() {
               <option value="private">Private — Not discoverable</option>
             </select>
           </div>
-          <Toggle field="showRating" label="Show Rating" description="Display your rating on public profile" />
-          <Toggle field="showCaseCount" label="Show Case Count" description="Display completed cases count" />
-          <Toggle field="showContactInfo" label="Show Contact Info" description="Display phone/email publicly" />
+          <Toggle checked={settings.showRating} onToggle={() => toggle("showRating")} label="Show Rating" description="Display your rating on public profile" />
+          <Toggle checked={settings.showCaseCount} onToggle={() => toggle("showCaseCount")} label="Show Case Count" description="Display completed cases count" />
+          <Toggle checked={settings.showContactInfo} onToggle={() => toggle("showContactInfo")} label="Show Contact Info" description="Display phone/email publicly" />
         </Section>
 
         {/* Security */}
         <Section title="Security" icon={Lock}>
-          <Toggle field="twoFactorAuth" label="Two-Factor Authentication" description="Add an extra layer of security" />
+          <Toggle checked={settings.twoFactorAuth} onToggle={() => toggle("twoFactorAuth")} label="Two-Factor Authentication" description="Add an extra layer of security" />
           <div className="mt-4">
             <label className="block text-[11px] font-medium text-neutral-500 uppercase tracking-wider mb-1.5">Session Timeout (minutes)</label>
             <select value={settings.sessionTimeout} onChange={(e) => update("sessionTimeout", e.target.value)}

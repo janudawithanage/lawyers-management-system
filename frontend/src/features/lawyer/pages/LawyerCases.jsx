@@ -19,7 +19,7 @@ import {
   ChevronRight, AlertTriangle, CheckCircle,
   XCircle, User, Calendar,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 import { CaseStatus, CASE_STATUS_CONFIG } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
@@ -33,7 +33,7 @@ const TABS = [
 ];
 
 export default function LawyerCases() {
-  const { cases, payments } = useAppStore();
+  const { cases } = useAppStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");

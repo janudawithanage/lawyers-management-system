@@ -39,9 +39,11 @@ const FILE_ICONS = {
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
-function getFileIcon(filename) {
+// Returns a key into FILE_ICONS rather than the icon itself: the icon is then
+// selected by lookup at the use site, which keeps it a static component.
+function fileIconKey(filename) {
   const ext = filename.split(".").pop()?.toLowerCase() || "";
-  return FILE_ICONS[ext] || FILE_ICONS.default;
+  return ext in FILE_ICONS ? ext : "default";
 }
 
 function formatFileSize(bytes) {
@@ -89,7 +91,7 @@ function UploadProgressItem({ file, progress, onCancel }) {
 // ── Document Row ─────────────────────────────────────────────
 
 function DocumentRow({ doc, onDelete }) {
-  const FileIcon = getFileIcon(doc.name);
+  const FileIcon = FILE_ICONS[fileIconKey(doc.name)];
   const uploadDate = new Date(doc.uploadedAt).toLocaleDateString("en-LK", {
     month: "short",
     day: "numeric",

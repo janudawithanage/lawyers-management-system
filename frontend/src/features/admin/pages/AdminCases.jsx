@@ -30,7 +30,7 @@ import {
   FileText,
   TrendingUp,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { CaseStatus } from "@utils/statusEnums";
 
 // ── Status Configuration ─────────────────────────────────────
@@ -64,7 +64,7 @@ function StatusBadge({ status }) {
 // ══════════════════════════════════════════════════════════════
 
 export default function AdminCases() {
-  const { cases, payments } = useAppStore();
+  const { cases } = useAppStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [sortField, setSortField] = useState("createdAt");

@@ -21,7 +21,6 @@ export default function Stepper({ steps, currentStep, className = "" }) {
       {steps.map((step, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isPending = index > currentStep;
 
         return (
           <div key={index} className="flex items-center">

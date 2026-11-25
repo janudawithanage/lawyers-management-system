@@ -37,8 +37,8 @@ import {
   Sparkles,
   MapPin,
 } from "lucide-react";
-import { useAuth } from "@context/AuthContext";
-import { useAppStore } from "@/store/globalStore";
+import { useAuth } from "@context/auth-context";
+import { useAppStore } from "@/store/app-store-context";
 import { lawyers, timeSlots } from "../data/mockClientData";
 import Stepper from "../components/Stepper";
 

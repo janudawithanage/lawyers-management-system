@@ -163,7 +163,6 @@ function ActionModal({ isOpen, onClose, onConfirm, targetStatus, disputeId }) {
 
 function DisputeDrawer({ dispute, onClose, onAction }) {
   if (!dispute) return null;
-  const priorityCfg = PRIORITY_CFG[dispute.priority] || PRIORITY_CFG[DisputePriority.LOW];
   const actions = getActions(dispute.status);
 
   return (

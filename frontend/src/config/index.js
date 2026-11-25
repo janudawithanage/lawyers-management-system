@@ -1,7 +1,13 @@
 /**
  * SL-LMS Application Configuration
  * Central source of truth for environment-specific settings.
+ *
+ * Environment-derived values come from `./env.js`, which validates them at
+ * boot. There are deliberately no `||` fallbacks here: a missing variable is
+ * a configuration error, not a cue to substitute a plausible default.
  */
+
+import env from "./env.js";
 
 const config = {
   /** Application identity */
@@ -10,14 +16,14 @@ const config = {
     fullName: "Sri Lanka Lawyer Management System",
     tagline: "Connecting You with Verified Lawyers Across Sri Lanka",
     version: "1.0.0",
-    url: import.meta.env.VITE_APP_URL || "https://sl-lms.lk",
+    url: env.appUrl,
     supportEmail: "info@sl-lms.lk",
     supportPhone: "+94 11 234 5678",
   },
 
   /** API settings */
   api: {
-    baseUrl: import.meta.env.VITE_API_URL || "/api/v1",
+    baseUrl: env.apiUrl,
     timeout: 15000,
   },
 

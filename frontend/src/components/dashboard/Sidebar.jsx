@@ -14,7 +14,6 @@
  */
 
 import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
 import {
   PanelLeftClose,
   PanelLeft,
@@ -24,7 +23,7 @@ import {
 import Logo from "@components/common/Logo";
 import SidebarItem from "./SidebarItem";
 import { getNavigationForRole, getRoleDisplay } from "@config/navigationConfig";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { DASHBOARD_ROUTES } from "@/routes/routeConfig";
 
 export default function Sidebar({
@@ -35,7 +34,6 @@ export default function Sidebar({
   onMouseLeave,
 }) {
   const { user, role, logout } = useAuth();
-  const location = useLocation();
 
   const navItems = useMemo(() => getNavigationForRole(role), [role]);
   const roleDisplay = useMemo(() => getRoleDisplay(role), [role]);

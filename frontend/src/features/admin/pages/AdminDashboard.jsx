@@ -30,7 +30,7 @@ import {
   ArrowRight,
   Inbox,
 } from "lucide-react";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 
 // ── Feature Components ───────────────────────────────────────
 import SystemSummary from "../components/SystemSummary";

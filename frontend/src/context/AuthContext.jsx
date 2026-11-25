@@ -14,39 +14,19 @@
  *  • tokenStorage — abstraction over sessionStorage
  *  • authService  — mock API (swap for real backend later)
  *  • config.roles — single source of truth for role constants
+ *
+ * The context object, the role map and the useAuth hook live in
+ * ./auth-context.js; this module exports only the provider component.
  */
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { tokenStorage } from "@utils/tokenStorage";
 import { authService } from "@features/auth/services/authService";
 import config from "@config";
 
-// ── Context ──────────────────────────────────────────────────
-const AuthContext = createContext(undefined);
-AuthContext.displayName = "AuthContext";
+import { AuthContext, getDashboardPath } from "./auth-context";
 
-// ── Role constants ───────────────────────────────────────────
 const { roles } = config;
-
-/** Map role → default dashboard path */
-export const ROLE_DASHBOARD_MAP = Object.freeze({
-  [roles.CLIENT]: "/dashboard/client",
-  [roles.LAWYER]: "/dashboard/lawyer",
-  [roles.ADMIN]: "/dashboard/admin",
-  [roles.SUPER_ADMIN]: "/dashboard/admin",
-});
-
-/** Get the dashboard path for a given role */
-export function getDashboardPath(role) {
-  return ROLE_DASHBOARD_MAP[role] || "/dashboard/client";
-}
 
 // ── Provider ─────────────────────────────────────────────────
 export function AuthProvider({ children }) {
@@ -161,7 +141,7 @@ export function AuthProvider({ children }) {
   );
 
   // Derived booleans
-  const isAuthenticated = !!user && !!token;
+  const isAuthenticated = Boolean(user) && Boolean(token);
   const isClient = role === roles.CLIENT;
   const isLawyer = role === roles.LAWYER;
   const isAdmin = role === roles.ADMIN || role === roles.SUPER_ADMIN;
@@ -217,16 +197,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-/** Hook: access auth context from any component */
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error(
-      "useAuth() must be used within <AuthProvider>. " +
-      "Wrap your app root with <AuthProvider>.",
-    );
-  }
-  return context;
-}
-
-export default AuthContext;
+export default AuthProvider;

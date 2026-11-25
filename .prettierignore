@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+package-lock.json
+*.min.js
+*.min.css
+frontend/public/
+frontend/src/assets/

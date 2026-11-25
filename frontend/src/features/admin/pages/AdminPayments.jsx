@@ -28,7 +28,7 @@ import {
   Wallet,
   CreditCard,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { PaymentStatus } from "@utils/statusEnums";
 
 // ── Status Configuration ─────────────────────────────────────

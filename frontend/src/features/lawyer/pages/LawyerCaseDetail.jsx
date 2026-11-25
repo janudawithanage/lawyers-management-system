@@ -21,7 +21,7 @@ import {
   Send, CheckCircle, XCircle, AlertTriangle, Plus,
   ChevronRight, Calendar, TrendingUp, Shield, Lock,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { CaseStatus, PaymentStatus, CASE_STATUS_CONFIG, PAYMENT_STATUS_CONFIG } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
 import CountdownTimer from "@components/common/CountdownTimer";
@@ -190,7 +190,7 @@ export default function LawyerCaseDetail() {
           {activeTab === "documents" && <DocumentsTab caseData={c} caseId={caseId} addDocument={addDocumentToCase} removeDocument={removeDocumentFromCase} isClosed={isClosed} />}
           {activeTab === "timeline" && <TimelineTab caseData={c} />}
           {activeTab === "messages" && <MessagesTab caseData={c} caseId={caseId} addMessage={addMessageToCase} isClosed={isClosed} />}
-          {activeTab === "payments" && <PaymentsTab caseData={c} caseId={caseId} casePayments={casePayments} requestPayment={requestCasePayment} isClosed={isClosed} />}
+          {activeTab === "payments" && <PaymentsTab caseId={caseId} casePayments={casePayments} requestPayment={requestCasePayment} isClosed={isClosed} />}
         </motion.div>
       </AnimatePresence>
 
@@ -360,7 +360,6 @@ function InfoRow({ label, value }) {
 
 function DocumentsTab({ caseData, caseId, addDocument, removeDocument, isClosed }) {
   const docs = caseData.documents || [];
-  const fileInputRef = useRef(null);
 
   const handleUpload = () => {
     const mockFiles = [
@@ -560,7 +559,7 @@ function MessagesTab({ caseData, caseId, addMessage, isClosed }) {
 //  PAYMENTS TAB
 // ══════════════════════════════════════════════════════════════
 
-function PaymentsTab({ caseData, caseId, casePayments, requestPayment, isClosed }) {
+function PaymentsTab({ caseId, casePayments, requestPayment, isClosed }) {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [reqAmount, setReqAmount] = useState("");
   const [reqDesc, setReqDesc] = useState("");

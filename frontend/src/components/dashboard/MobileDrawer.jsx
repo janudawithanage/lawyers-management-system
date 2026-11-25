@@ -14,7 +14,7 @@ import { X } from "lucide-react";
 import Logo from "@components/common/Logo";
 import SidebarItem from "./SidebarItem";
 import { getNavigationForRole, getRoleDisplay } from "@config/navigationConfig";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { DASHBOARD_ROUTES } from "@/routes/routeConfig";
 
 export default function MobileDrawer({ isOpen, onClose }) {

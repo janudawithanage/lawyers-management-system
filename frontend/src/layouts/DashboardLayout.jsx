@@ -12,7 +12,7 @@
 
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { useSidebar } from "@hooks";
 import Sidebar from "@components/dashboard/Sidebar";
 import TopNavbar from "@components/dashboard/TopNavbar";

@@ -16,8 +16,6 @@
  */
 
 import {
-  createContext,
-  useContext,
   useReducer,
   useCallback,
   useMemo,
@@ -257,8 +255,7 @@ function appReducer(state, action) {
 
 // ── Context ──────────────────────────────────────────────────
 
-const AppStoreContext = createContext(undefined);
-AppStoreContext.displayName = "AppStoreContext";
+import { AppStoreContext } from "./app-store-context";
 
 // ── Provider ─────────────────────────────────────────────────
 
@@ -1080,13 +1077,4 @@ export function AppStoreProvider({ children }) {
   );
 }
 
-/** Hook: access global store */
-export function useAppStore() {
-  const context = useContext(AppStoreContext);
-  if (!context) {
-    throw new Error("useAppStore() must be used within <AppStoreProvider>.");
-  }
-  return context;
-}
-
-export default AppStoreContext;
+export default AppStoreProvider;

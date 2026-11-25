@@ -11,7 +11,7 @@ import { AuthLayout } from "../../../layouts/AuthLayout";
 import { Input } from "../components/Input";
 import { Button } from "../../../components/ui";
 import { validateEmail, validatePassword } from "../validation/authValidation";
-import { useAuth, getDashboardPath } from "@context/AuthContext";
+import { useAuth, getDashboardPath } from "@context/auth-context";
 
 export default function LoginPage() {
   const navigate = useNavigate();

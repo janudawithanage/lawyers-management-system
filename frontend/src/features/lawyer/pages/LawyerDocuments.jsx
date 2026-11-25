@@ -25,7 +25,7 @@ import {
   Image,
   Shield,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 
 export default function LawyerDocuments() {

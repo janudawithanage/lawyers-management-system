@@ -1,17 +1,18 @@
 /**
- * SL-LMS Theme Context
+ * SL-LMS Theme Context — provider
  *
  * Provides dark/light theme switching infrastructure.
  * Currently defaults to dark mode (BASL branding).
  * Ready for future light-mode toggle.
+ *
+ * The context object, the THEMES constant and the useTheme hook live in
+ * `./theme-context.js`; this module exports only the component.
  */
 
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { prefStorage } from "@utils";
 
-const ThemeContext = createContext(undefined);
-
-const THEMES = { DARK: "dark", LIGHT: "light" };
+import { ThemeContext, THEMES } from "./theme-context";
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => prefStorage.getTheme());
@@ -37,23 +38,10 @@ export function ThemeProvider({ children }) {
 
   const value = useMemo(
     () => ({ theme, setTheme, toggleTheme, isDark }),
-    [theme, setTheme, toggleTheme, isDark]
+    [theme, setTheme, toggleTheme, isDark],
   );
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
-}
-
-export { THEMES };
-export default ThemeContext;
+export default ThemeProvider;

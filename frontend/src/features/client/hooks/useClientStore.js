@@ -11,8 +11,8 @@
  */
 
 import { useMemo } from "react";
-import { useAppStore } from "@/store/globalStore";
-import { useAuth } from "@context/AuthContext";
+import { useAppStore } from "@/store/app-store-context";
+import { useAuth } from "@context/auth-context";
 
 const MOCK_CLIENT_ID = "USR-2026-0001";
 

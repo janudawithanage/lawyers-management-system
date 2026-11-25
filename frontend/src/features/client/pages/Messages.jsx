@@ -106,7 +106,10 @@ function ConversationCard({ caseData, lastMessage, unread, isActive, onClick }) 
 
 export default function Messages() {
   const { myCases, addMessageToCase } = useClientStore();
-  const [selectedCaseId, setSelectedCaseId] = useState(null);
+  // `null` means "nothing chosen yet"; the first conversation is then used.
+  // Derived rather than written back by an effect, which would render twice
+  // and briefly show the empty pane.
+  const [chosenCaseId, setChosenCaseId] = useState(null);
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef(null);
@@ -133,6 +136,13 @@ export default function Messages() {
     );
   }, [conversations, searchQuery]);
 
+  const selectedCaseId = useMemo(() => {
+    if (chosenCaseId && conversations.some((c) => c.id === chosenCaseId)) {
+      return chosenCaseId;
+    }
+    return conversations[0]?.id ?? null;
+  }, [chosenCaseId, conversations]);
+
   const selectedCase = useMemo(
     () => conversations.find((c) => c.id === selectedCaseId),
     [conversations, selectedCaseId]
@@ -144,13 +154,6 @@ export default function Messages() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
-
-  // Auto-select first if none
-  useEffect(() => {
-    if (!selectedCaseId && conversations.length > 0) {
-      setSelectedCaseId(conversations[0].id);
-    }
-  }, [conversations, selectedCaseId]);
 
   const handleSend = useCallback(() => {
     if (!inputText.trim() || !selectedCaseId) return;
@@ -200,7 +203,7 @@ export default function Messages() {
               lastMessage={(c.messages || []).at(-1)}
               unread={0}
               isActive={selectedCaseId === c.id}
-              onClick={() => setSelectedCaseId(c.id)}
+              onClick={() => setChosenCaseId(c.id)}
             />
           ))}
         </div>
@@ -213,7 +216,7 @@ export default function Messages() {
             {/* Chat Header */}
             <div className="flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.06] bg-white/[0.01]">
               <button
-                onClick={() => setSelectedCaseId(null)}
+                onClick={() => setChosenCaseId(null)}
                 className="sm:hidden p-1 rounded-lg hover:bg-white/[0.06]"
               >
                 <ArrowLeft className="w-4 h-4 text-neutral-400" />

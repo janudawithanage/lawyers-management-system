@@ -22,7 +22,7 @@ import {
   DollarSign,
   Wallet,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { AppointmentStatus, CaseStatus, PaymentStatus } from "@utils/statusEnums";
 import ReportsWidget from "../components/ReportsWidget";
 import {

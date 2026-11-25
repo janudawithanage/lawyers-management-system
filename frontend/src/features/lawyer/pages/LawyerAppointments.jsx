@@ -20,7 +20,7 @@ import {
   ChevronDown, ChevronUp, MessageSquare, Briefcase,
   Timer, CreditCard, Search, Filter,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 import { AppointmentStatus, APPOINTMENT_STATUS_CONFIG } from "@utils/statusEnums";
 import CountdownTimer from "@components/common/CountdownTimer";

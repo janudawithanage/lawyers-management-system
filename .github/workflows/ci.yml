@@ -1,0 +1,50 @@
+name: CI
+
+# Pull requests are the gate: `main` is protected and cannot be pushed to
+# directly, so every change arrives here first. The push trigger on `main`
+# exists only to keep the branch's own status current after a merge.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A new push to a pull request makes the previous run irrelevant.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Install, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Both packages read their configuration from one `.env` at the root and
+      # fail fast when a variable is missing, so CI supplies the tracked
+      # template. This also means a variable added to the schema without being
+      # added to `.env.example` fails the build here rather than in production.
+      - name: Provide the environment template
+        run: cp .env.example .env
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

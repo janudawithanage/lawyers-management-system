@@ -151,7 +151,7 @@ export const tokenStorage = Object.freeze({
 
   /** Check if a session exists at all */
   hasSession() {
-    return !!_get(KEYS.ACCESS_TOKEN) && !!_getJSON(KEYS.USER);
+    return Boolean(_get(KEYS.ACCESS_TOKEN)) && Boolean(_getJSON(KEYS.USER));
   },
 
   /**

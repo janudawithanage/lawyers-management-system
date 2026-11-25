@@ -40,7 +40,7 @@ import {
   Scale,
   MessageSquare,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { AppointmentStatus } from "@utils/statusEnums";
 import { APPOINTMENT_STATUS_CONFIG } from "@utils/statusEnums";
 import StatusBadge from "@components/common/StatusBadge";
@@ -277,7 +277,7 @@ function AppointmentLifecycleCard({ appointment, onCancel, onOpenPayment }) {
               <TimelineStep
                 label="Lawyer Review"
                 time={appointment.approvedAt || appointment.declinedAt}
-                done={!!appointment.approvedAt || !!appointment.declinedAt}
+                done={Boolean(appointment.approvedAt) || Boolean(appointment.declinedAt)}
                 active={isPending}
               />
               {appointment.status !== AppointmentStatus.DECLINED && (
@@ -285,7 +285,7 @@ function AppointmentLifecycleCard({ appointment, onCancel, onOpenPayment }) {
                   <TimelineStep
                     label="Payment"
                     time={appointment.paidAt}
-                    done={!!appointment.paidAt}
+                    done={Boolean(appointment.paidAt)}
                     active={isAwaitingPayment}
                   />
                   <TimelineStep

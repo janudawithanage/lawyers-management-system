@@ -24,7 +24,7 @@ import {
   Info,
 } from "lucide-react";
 import ActivityLogItem from "../components/ActivityLogItem";
-import { activityLog, formatRelativeTime } from "../data/mockAdminData";
+import { activityLog } from "../data/mockAdminData";
 
 const TYPE_FILTERS = [
   { id: "all", label: "All" },

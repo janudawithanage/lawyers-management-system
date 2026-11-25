@@ -15,7 +15,7 @@ import {
   HelpCircle,
   Shield,
 } from "lucide-react";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { getRoleDisplay } from "@config/navigationConfig";
 import { DASHBOARD_ROUTES } from "@/routes/routeConfig";
 

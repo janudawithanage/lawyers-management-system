@@ -15,7 +15,7 @@
  */
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "@context/auth-context";
 import { PATHS } from "@/routes/routeConfig";
 
 /** Full-screen loading state while session hydrates */

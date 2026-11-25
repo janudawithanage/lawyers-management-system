@@ -24,7 +24,7 @@ import {
   AlertCircle,
   Download,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 import { MOCK_LAWYER_ID } from "../data/mockLawyerData";
 
 const FMT = (n) => `LKR ${Number(n || 0).toLocaleString("en-LK")}`;

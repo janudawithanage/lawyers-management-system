@@ -12,7 +12,7 @@
  *  • System info sidebar
  */
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings,
@@ -29,7 +29,7 @@ import {
   Zap,
   Info,
 } from "lucide-react";
-import { useAppStore } from "@/store/globalStore";
+import { useAppStore } from "@/store/app-store-context";
 
 // ══════════════════════════════════════════════════════════════
 
